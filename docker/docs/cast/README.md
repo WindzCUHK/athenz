@@ -1,0 +1,67 @@
+
+<a id="markdown-athenz-demo-recording" name="athenz-demo-recording"></a>
+# Athenz Demo Recording
+
+<!-- TOC -->
+
+- [Athenz Demo Recording](#athenz-demo-recording)
+    - [Athenz Demo](#athenz-demo)
+        - [playback](#playback)
+            - [web](#web)
+            - [docker](#docker)
+        - [recording](#recording)
+    - [About asciinema](#about-asciinema)
+
+<!-- /TOC -->
+
+<a id="markdown-athenz-demo" name="athenz-demo"></a>
+## Athenz Demo
+
+<a id="markdown-playback" name="playback"></a>
+### playback
+
+<a id="markdown-web" name="web"></a>
+#### web
+[![asciicast](https://asciinema.org/a/D1F3SV50yp4v6IEbw7zRtHu2G.svg)](https://asciinema.org/a/D1F3SV50yp4v6IEbw7zRtHu2G)
+
+<a id="markdown-docker" name="docker"></a>
+#### docker
+
+```bash
+BASE_DIR="`git rev-parse --show-toplevel`"
+CAST_DIR="${BASE_DIR}/docker/docs/cast"
+
+docker run --rm -ti \
+  -v "$HOME/.config/asciinema":/root/.config/asciinema \
+  -v "${CAST_DIR}":/root/cast \
+  asciinema/asciinema \
+  asciinema play --speed=3 /root/cast/athenz-bootstrap-demo.cast
+```
+
+<a id="markdown-recording" name="recording"></a>
+### recording
+
+```bash
+BASE_DIR="`git rev-parse --show-toplevel`"
+CAST_DIR="${BASE_DIR}/docker/docs/cast"
+
+asciinema rec --title='Athenz Docker Build Demo' "${CAST_DIR}/athenz-docker-build-demo.cast"
+# cd "`git rev-parse --show-toplevel`/docker"; make build;
+
+asciinema rec --title='Athenz Bootstrap Demo' "${CAST_DIR}/athenz-bootstrap-demo.cast"
+# sh "`git rev-parse --show-toplevel`/docker/docs/cast/bootstrap-demo-welcome-script.sh"
+
+# asciinema rec --title='Athenz Acceptance Test Demo' "${CAST_DIR}/athenz-acceptance-test-demo.cast"
+```
+
+<a id="markdown-about-asciinema" name="about-asciinema"></a>
+## About asciinema
+- [Installation - asciinema](https://asciinema.org/docs/installation)
+- [Usage - asciinema](https://asciinema.org/docs/usage)
+- Installation note
+    ```bash
+    cd $HOME
+    git clone https://github.com/asciinema/asciinema.git
+    export PYTHONPATH="$PYTHONPATH:$HOME/asciinema"
+    alias asciinema='python3 -m asciinema'
+    ```

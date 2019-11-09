@@ -4,6 +4,7 @@ prompt = no
 default_md = sha256
 distinguished_name = dn
 x509_extensions	= v3_ca
+string_mask = utf8only
 
 [ dn ]
 C = US
@@ -13,4 +14,4 @@ CN = Sample Self Signed Athenz CA
 [ v3_ca ]
 basicConstraints = critical,CA:true
 subjectKeyIdentifier=hash
-authorityKeyIdentifier=keyid:always,issuer
+authorityKeyIdentifier=keyid:always

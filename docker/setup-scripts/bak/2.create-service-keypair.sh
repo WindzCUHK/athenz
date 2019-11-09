@@ -16,7 +16,9 @@ ZMS_SERVICE_PUB_PATH=${ZMS_SERVICE_PUB_PATH:-./docker/zms/var/keys/zms_public.pe
 ZTS_SERVICE_PUB_PATH=${ZTS_SERVICE_PUB_PATH:-./docker/zts/var/keys/zts_public.pem}
 UI_SERVICE_PUB_PATH=${UI_SERVICE_PUB_PATH:-./docker/ui/var/keys/athenz.ui-server_pub.pem}
 
-
+mkdir -p `dirname "${ZMS_SERVICE_PK_PATH}"`
+mkdir -p `dirname "${ZTS_SERVICE_PK_PATH}"`
+mkdir -p `dirname "${UI_SERVICE_PK_PATH}"`
 
 # -------------------------------- ZMS --------------------------------
 openssl genrsa -out "${ZMS_SERVICE_PK_PATH}" "${KEY_BITS}"

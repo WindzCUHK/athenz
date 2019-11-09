@@ -1,15 +1,14 @@
 build:
-	docker build -t wait-for-mysql -f ./deploy-scripts/common/wait-for-mysql/Dockerfile ./deploy-scripts/common/wait-for-mysql
-	docker build -t rdl-athenz-server -f ./util/rdl-athenz-server/Dockerfile ../rdl/rdl-gen-athenz-server
-	docker build -t athenz-mvn-base -f ./util/athenz-mvn-base/Dockerfile ../
-	docker build -t athenz-builder -f ./util/athenz-builder/Dockerfile ../
-	docker build -t athenz-zms-server -f ./zms/Dockerfile ../
-	docker build -t athenz-zts-server -f ./zts/Dockerfile ../
-	docker build -t athenz-ui -f ./ui/Dockerfile ../ui
-	docker build -t athenz-zms-db -f ./db/zms/Dockerfile ../servers/zms/schema
-	docker build -t athenz-zts-db -f ./db/zts/Dockerfile ../servers/zts/schema
-	docker build -t athenz-zms-cli -f ./util/zms-cli/Dockerfile ../
-	docker build -t athenz-cli-util -f ./util/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build -t rdl-athenz-server -f ./util/rdl-athenz-server/Dockerfile ../rdl/rdl-gen-athenz-server
+	DOCKER_BUILDKIT=1 docker build -t athenz-mvn-base -f ./util/athenz-mvn-base/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build -t athenz-builder -f ./util/athenz-builder/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build -t athenz-zms-server -f ./zms/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build -t athenz-zts-server -f ./zts/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build -t athenz-ui -f ./ui/Dockerfile ../ui
+	DOCKER_BUILDKIT=1 docker build -t athenz-zms-db -f ./db/zms/Dockerfile ../servers/zms/schema
+	DOCKER_BUILDKIT=1 docker build -t athenz-zts-db -f ./db/zts/Dockerfile ../servers/zts/schema
+	DOCKER_BUILDKIT=1 docker build -t athenz-zms-cli -f ./util/zms-cli/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build -t athenz-cli-util -f ./util/Dockerfile ../
 
 setup-dev-config:
 	sh ./setup-scripts/all-in-one.dev.sh
@@ -33,23 +32,23 @@ run-ui:
 
 remove-all: remove-containers remove-networks remove-files
 remove-containers:
-	docker ps -a | grep athenz- | awk '{print $$1}' | xargs docker stop
-	docker ps -a | grep athenz- | awk '{print $$1}' | xargs docker rm
+	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker stop
+	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker rm
 remove-networks:
-	docker network rm $${DOCKER_NETWORK:-athenz}
+	docker network rm $${DOCKER_NETWORK:-athenz} || true
 remove-files:
-	sudo rm -rf ./logs
-	sudo rm -rf ./zts/var/zts_store
+	rm -rf ./logs
+	rm -rf ./zts/var/zts_store
 
 clean: remove-all
-	docker image rm wait-for-mysql
-	docker image rm rdl-athenz-server
-	docker image rm athenz-mvn-base
-	docker image rm athenz-builder
-	docker image rm athenz-zms-server
-	docker image rm athenz-zts-server
-	docker image rm athenz-ui
-	docker image rm athenz-zms-db
-	docker image rm athenz-zts-db
-	docker image rm athenz-zms-cli
-	docker image rm athenz-cli-util
+	docker image rm wait-for-mysql || true
+	docker image rm rdl-athenz-server || true
+	docker image rm athenz-mvn-base || true
+	docker image rm athenz-builder || true
+	docker image rm athenz-zms-server || true
+	docker image rm athenz-zts-server || true
+	docker image rm athenz-ui || true
+	docker image rm athenz-zms-db || true
+	docker image rm athenz-zts-db || true
+	docker image rm athenz-zms-cli || true
+	docker image rm athenz-cli-util || true

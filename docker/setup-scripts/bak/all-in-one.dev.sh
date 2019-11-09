@@ -35,8 +35,8 @@ docker run --rm --entrypoint /usr/bin/run.sh \
 # run setup scripts (4)
 printf '\nWill run: 4.create-keystore.sh\n'
 docker run --rm --entrypoint /usr/bin/run.sh \
-  -e ZMS_SSL_KEYSTORE_PASS=${ZMS_SSL_KEYSTORE_PASS:-athenz} \
-  -e ZTS_SSL_KEYSTORE_PASS=${ZTS_SSL_KEYSTORE_PASS:-athenz} \
+  -e ZMS_KEYSTORE_PASS=${ZMS_KEYSTORE_PASS:-athenz} \
+  -e ZTS_KEYSTORE_PASS=${ZTS_KEYSTORE_PASS:-athenz} \
   -v `pwd`:/usr/bin/docker \
   -v `pwd`/setup-scripts/4.create-keystore.sh:/usr/bin/run.sh \
   --name openssl-alpine openssl-alpine 2>/dev/null
@@ -44,8 +44,8 @@ docker run --rm --entrypoint /usr/bin/run.sh \
 # run setup scripts (5)
 printf '\nWill run: 5.create-truststore.sh\n'
 docker run --rm --entrypoint /usr/bin/run.sh \
-  -e ZMS_SSL_TRUSTSTORE_PASS=${ZMS_SSL_TRUSTSTORE_PASS:-athenz} \
-  -e ZTS_SSL_TRUSTSTORE_PASS=${ZTS_SSL_TRUSTSTORE_PASS:-athenz} \
+  -e ZMS_TRUSTSTORE_PASS=${ZMS_TRUSTSTORE_PASS:-athenz} \
+  -e ZTS_TRUSTSTORE_PASS=${ZTS_TRUSTSTORE_PASS:-athenz} \
   -v `pwd`:/usr/bin/docker \
   -v `pwd`/setup-scripts/5.create-truststore.sh:/usr/bin/run.sh \
   --name keytool-alpine keytool-alpine 2>/dev/null
@@ -62,7 +62,7 @@ docker run --rm --entrypoint /usr/bin/run.sh \
 # [DEV env. only] run setup scripts (6.2)
 printf '\nWill run: 6.2.trust-zts-cert-signer-CA.sh\n'
 docker run --rm --entrypoint /usr/bin/run.sh \
-  -e ZTS_SSL_TRUSTSTORE_PASS=${ZTS_SSL_TRUSTSTORE_PASS:-athenz} \
+  -e ZTS_TRUSTSTORE_PASS=${ZTS_TRUSTSTORE_PASS:-athenz} \
   -v `pwd`:/usr/bin/docker \
   -v `pwd`/setup-scripts/6.2.trust-zts-cert-signer-CA.sh:/usr/bin/run.sh \
   --name keytool-alpine keytool-alpine 2>/dev/null

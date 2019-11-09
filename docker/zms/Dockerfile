@@ -12,9 +12,9 @@ ENV USER_CLASSPATH='/usr/lib/jars/*'
 ENV CONF_PATH='conf/zms_server'
 
 # ENV for passwords
-ENV ZMS_JDBC_PASSWORD=''
-ENV ZMS_SSL_KEYSTORE_PASS=''
-ENV ZMS_SSL_TRUSTSTORE_PASS=''
+ENV ZMS_DB_ADMIN_PASS=''
+ENV ZMS_KEYSTORE_PASS=''
+ENV ZMS_TRUSTSTORE_PASS=''
 
 ENTRYPOINT ["sh", "-c", "eval $0 $@", "java"]
 CMD [ \
@@ -24,9 +24,9 @@ CMD [ \
   "-Dathenz.zms.prop_file=${CONF_PATH}/zms.properties", \
   "-Dlogback.configurationFile=${CONF_PATH}/logback.xml", \
   # system properties for passwords
-  "-Dathenz.zms.jdbc_password=${ZMS_JDBC_PASSWORD}", \
-  "-Dathenz.ssl_key_store_password=${ZMS_SSL_KEYSTORE_PASS}", \
-  "-Dathenz.ssl_trust_store_password=${ZMS_SSL_TRUSTSTORE_PASS}", \
+  "-Dathenz.zms.jdbc_password=${ZMS_DB_ADMIN_PASS}", \
+  "-Dathenz.ssl_key_store_password=${ZMS_KEYSTORE_PASS}", \
+  "-Dathenz.ssl_trust_store_password=${ZMS_TRUSTSTORE_PASS}", \
   # main class
   "com.yahoo.athenz.container.AthenzJettyContainer" \
 ]

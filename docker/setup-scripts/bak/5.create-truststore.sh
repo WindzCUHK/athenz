@@ -13,19 +13,19 @@ ZMS_SSL_TRUSTSTORE_PATH=${ZMS_SSL_TRUSTSTORE_PATH:-./docker/zms/var/certs/zms_tr
 ZTS_SSL_TRUSTSTORE_PATH=${ZTS_SSL_TRUSTSTORE_PATH:-./docker/zts/var/certs/zts_truststore.jks}
 
 # server truststore password
-ZMS_SSL_TRUSTSTORE_PASS=${ZMS_SSL_TRUSTSTORE_PASS:-athenz}
-ZTS_SSL_TRUSTSTORE_PASS=${ZTS_SSL_TRUSTSTORE_PASS:-athenz}
+ZMS_TRUSTSTORE_PASS=${ZMS_TRUSTSTORE_PASS:-athenz}
+ZTS_TRUSTSTORE_PASS=${ZTS_TRUSTSTORE_PASS:-athenz}
 
 
 
 # -------------------------------- ZMS --------------------------------
-rm -f ${ZMS_SSL_TRUSTSTORE_PATH}
+rm -f "${ZMS_SSL_TRUSTSTORE_PATH}"
 CERT_ALIAS='zts-https'
-keytool -importcert -noprompt -keystore ${ZMS_SSL_TRUSTSTORE_PATH} -storepass "${ZMS_SSL_TRUSTSTORE_PASS}" -storetype JKS -alias "${CERT_ALIAS}" -file ${ZTS_X509_OUT_PATH}
+keytool -importcert -noprompt -keystore "${ZMS_SSL_TRUSTSTORE_PATH}" -storepass "${ZMS_TRUSTSTORE_PASS}" -storetype JKS -alias "${CERT_ALIAS}" -file "${ZTS_X509_OUT_PATH}"
 CERT_ALIAS='ui-https'
-keytool -importcert -noprompt -keystore ${ZMS_SSL_TRUSTSTORE_PATH} -storepass "${ZMS_SSL_TRUSTSTORE_PASS}" -storetype JKS -alias "${CERT_ALIAS}" -file ${UI_X509_OUT_PATH}
+keytool -importcert -noprompt -keystore "${ZMS_SSL_TRUSTSTORE_PATH}" -storepass "${ZMS_TRUSTSTORE_PASS}" -storetype JKS -alias "${CERT_ALIAS}" -file "${UI_X509_OUT_PATH}"
 
 # -------------------------------- ZTS --------------------------------
-rm -f ${ZTS_SSL_TRUSTSTORE_PATH}
+rm -f "${ZTS_SSL_TRUSTSTORE_PATH}"
 CERT_ALIAS='zms-https'
-keytool -importcert -noprompt -keystore ${ZTS_SSL_TRUSTSTORE_PATH} -storepass "${ZTS_SSL_TRUSTSTORE_PASS}" -storetype JKS -alias "${CERT_ALIAS}" -file ${ZMS_X509_OUT_PATH}
+keytool -importcert -noprompt -keystore "${ZTS_SSL_TRUSTSTORE_PATH}" -storepass "${ZTS_TRUSTSTORE_PASS}" -storetype JKS -alias "${CERT_ALIAS}" -file "${ZMS_X509_OUT_PATH}"
