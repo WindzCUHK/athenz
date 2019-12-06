@@ -1,5 +1,8 @@
 #!/bin/sh
 
+set -eu
+set -o pipefail
+
 # to script directory
 cd "$(dirname "$0")"
 
@@ -8,14 +11,20 @@ cd ../
 
 # variables
 DOCKER_NETWORK=${DOCKER_NETWORK:-athenz}
+DOCKER_NETWORK_SUBNET="${DOCKER_NETWORK_SUBNET:-172.21.0.0/16}"
 ZTS_DB_HOST=${ZTS_DB_HOST:-athenz-zts-db}
 ZTS_DB_PORT=${ZTS_DB_PORT:-3307}
 ZTS_HOST=${ZTS_HOST:-athenz-zts-server}
 ZTS_PORT=${ZTS_PORT:-8443}
 
 # check password
-[[ -z "$ZTS_DB_ROOT_PASS" ]] && echo "ZTS_DB_ROOT_PASS not set" && exit 1
-[[ -z "$ZTS_DB_ADMIN_PASS" ]] && echo "ZTS_DB_ADMIN_PASS not set" && exit 1
+[ -z "$ZTS_DB_ROOT_PASS" ] && echo "ZTS_DB_ROOT_PASS not set" && exit 1
+[ -z "$ZTS_DB_ADMIN_PASS" ] && echo "ZTS_DB_ADMIN_PASS not set" && exit 1
+
+# create docker network if not exist
+if ! docker network inspect "${DOCKER_NETWORK}" > /dev/null 2>&1; then
+  docker network create --subnet "${DOCKER_NETWORK_SUBNET}" "${DOCKER_NETWORK}";
+fi
 
 # start ZTS DB
 printf "\nWill start ZTS DB...\n"

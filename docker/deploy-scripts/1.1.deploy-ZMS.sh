@@ -1,5 +1,8 @@
 #!/bin/sh
 
+set -eu
+set -o pipefail
+
 # to script directory
 cd "$(dirname "$0")"
 
@@ -8,14 +11,20 @@ cd ../
 
 # variables
 DOCKER_NETWORK=${DOCKER_NETWORK:-athenz}
+DOCKER_NETWORK_SUBNET="${DOCKER_NETWORK_SUBNET:-172.21.0.0/16}"
 ZMS_DB_HOST=${ZMS_DB_HOST:-athenz-zms-db}
 ZMS_DB_PORT=${ZMS_DB_PORT:-3306}
 ZMS_HOST=${ZMS_HOST:-athenz-zms-server}
 ZMS_PORT=${ZMS_PORT:-4443}
 
 # check password
-[[ -z "$ZMS_DB_ROOT_PASS" ]] && echo "ZMS_DB_ROOT_PASS not set" && exit 1
-[[ -z "$ZMS_DB_ADMIN_PASS" ]] && echo "ZMS_DB_ADMIN_PASS not set" && exit 1
+[ -z "$ZMS_DB_ROOT_PASS" ] && echo "ZMS_DB_ROOT_PASS not set" && exit 1
+[ -z "$ZMS_DB_ADMIN_PASS" ] && echo "ZMS_DB_ADMIN_PASS not set" && exit 1
+
+# create docker network if not exist
+if ! docker network inspect "${DOCKER_NETWORK}" > /dev/null 2>&1; then
+  docker network create --subnet "${DOCKER_NETWORK_SUBNET}" "${DOCKER_NETWORK}";
+fi
 
 # start ZMS DB
 printf "\nWill start ZMS DB...\n"

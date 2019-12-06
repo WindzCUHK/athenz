@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -u
+set -eu
 set -o pipefail
 
 # to script directory
