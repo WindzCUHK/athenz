@@ -45,13 +45,13 @@ docker run --rm -ti \
 BASE_DIR="`git rev-parse --show-toplevel`"
 CAST_DIR="${BASE_DIR}/docker/docs/cast"
 
-asciinema rec --title='Athenz Docker Build Demo' "${CAST_DIR}/athenz-docker-build-demo.cast"
+asciinema rec --overwrite --title='Athenz Docker Build Demo' "${CAST_DIR}/athenz-docker-build-demo.cast"
 # cd "`git rev-parse --show-toplevel`/docker"; make build; exit;
 
-asciinema rec --title='Athenz Bootstrap Demo' "${CAST_DIR}/athenz-bootstrap-demo.cast"
+asciinema rec --overwrite --title='Athenz Bootstrap Demo' "${CAST_DIR}/athenz-bootstrap-demo.cast"
 # sh "`git rev-parse --show-toplevel`/docker/docs/cast/bootstrap-demo-welcome-script.sh"
 
-# asciinema rec --title='Athenz Acceptance Test Demo' "${CAST_DIR}/athenz-acceptance-test-demo.cast"
+# asciinema rec --overwrite --title='Athenz Acceptance Test Demo' "${CAST_DIR}/athenz-acceptance-test-demo.cast"
 ```
 
 <a id="markdown-about-asciinema" name="about-asciinema"></a>
