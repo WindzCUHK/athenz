@@ -62,6 +62,8 @@ asciinema rec --title='Athenz Bootstrap Demo' "${CAST_DIR}/athenz-bootstrap-demo
     ```bash
     cd $HOME
     git clone https://github.com/asciinema/asciinema.git
+    ```
+    ```bash
     export PYTHONPATH="${PYTHONPATH:-}:$HOME/asciinema"
     alias asciinema='python3 -m asciinema'
     ```
