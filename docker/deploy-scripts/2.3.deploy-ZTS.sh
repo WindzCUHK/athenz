@@ -43,8 +43,11 @@ docker run --rm \
   -v "`pwd`/deploy-scripts/common/wait-for-mysql/wait-for-mysql.sh:/bin/wait-for-mysql.sh" \
   -v "`pwd`/db/zts/zts-db.cnf:/etc/my.cnf" \
   -e "MYSQL_PWD=${ZTS_DB_ROOT_PASS}" \
+  --entrypoint '/bin/wait-for-mysql.sh' \
   --name wait-for-mysql athenz-zts-db \
-  /bin/wait-for-mysql.sh ${ZTS_DB_HOST}
+  --user='root' \
+  --host="${ZTS_DB_HOST}" \
+  --port="${ZTS_DB_PORT}"
 
 # add zts_admin
 printf "\nWill add zts_admin user to DB and remove root user with wildcard host...\n"

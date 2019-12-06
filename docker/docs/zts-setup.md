@@ -315,7 +315,8 @@ llt | tail
 # add ZTS host
 # grep "${ZTS_HOST}" /etc/hosts && echo '/etc/hosts already set' || sudo sed -i "$ a\127.0.0.1 ${ZTS_HOST}" /etc/hosts
 
-curl "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"
+# ZTS health check
+curl -v "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"
 ```
 
 <a id="markdown-appendix" name="appendix"></a>

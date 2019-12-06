@@ -121,6 +121,7 @@ curl -k --request GET \
     --cert "${DOMAIN_ADMIN_CERT_PATH}" \
     --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"
 
+echo ''
 echo '10. create athenz.conf' | colored_cat g
 docker run --rm --network="${DOCKER_NETWORK}" \
     --user "$(id -u):$(id -g)" \
@@ -153,4 +154,5 @@ llt | tail
 echo 'add ZTS host' | colored_cat y
 grep "${ZTS_HOST}" /etc/hosts && echo '/etc/hosts already set' || sudo sed -i "$ a\127.0.0.1 ${ZTS_HOST}" /etc/hosts
 
-curl "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"
+echo 'ZTS health check' | colored_cat y
+curl -v "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"
