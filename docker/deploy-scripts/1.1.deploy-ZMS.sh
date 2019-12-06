@@ -62,7 +62,7 @@ docker exec --user "$(id -u):$(id -g)" "${ZMS_DB_HOST}" mysql \
 docker exec --user "$(id -u):$(id -g)" "${ZMS_DB_HOST}" mysql \
   --database=mysql \
   --user=root --password="${ZMS_DB_ROOT_PASS}" \
-  --execute="SELECT host, user FROM user;"
+  --execute="SELECT user, host FROM user;"
 
 # start ZMS
 printf "\nWill start ZMS server...\n"

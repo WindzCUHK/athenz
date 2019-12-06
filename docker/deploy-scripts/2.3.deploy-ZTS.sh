@@ -62,7 +62,7 @@ docker exec --user "$(id -u):$(id -g)" "${ZTS_DB_HOST}" mysql \
 docker exec --user "$(id -u):$(id -g)" "${ZTS_DB_HOST}" mysql \
   --database=mysql \
   --user=root --password="${ZTS_DB_ROOT_PASS}" \
-  --execute="SELECT host, user FROM user;"
+  --execute="SELECT user, host FROM user;"
 
 # start ZTS
 printf "\nWill start ZTS server...\n"
