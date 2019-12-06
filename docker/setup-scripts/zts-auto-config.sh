@@ -25,7 +25,10 @@ EOF
 # set up env. secretly
 BASE_DIR="`git rev-parse --show-toplevel`"
 source "${BASE_DIR}/docker/env.sh"
-test -f './dev-env-exports.sh' && source './dev-env-exports.sh'
+if [ -f './dev-env-exports.sh' ]; then
+    source './dev-env-exports.sh'
+    echo 'Be careful! You are using the DEV settings !!!'
+fi
 
 ### ----------------------------------------------------------------
 echo ''
