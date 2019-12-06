@@ -90,7 +90,7 @@ In Athenz, we often have 3 types of CA:
 <a id="markdown-athenz-demo-playback" name="athenz-demo-playback"></a>
 ### Athenz Demo Playback
 - [cast](./cast)
-- [![asciicast](https://asciinema.org/a/D1F3SV50yp4v6IEbw7zRtHu2G.svg)](https://asciinema.org/a/D1F3SV50yp4v6IEbw7zRtHu2G)
+- [![asciicast](https://asciinema.org/a/Q4fxxR6iY88TQCTSpvyYbrCFN.svg)](https://asciinema.org/a/Q4fxxR6iY88TQCTSpvyYbrCFN)
 
 <a id="markdown-points-to-note" name="points-to-note"></a>
 ### points to note

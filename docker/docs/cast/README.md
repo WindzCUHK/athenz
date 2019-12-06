@@ -22,7 +22,7 @@
 
 <a id="markdown-web" name="web"></a>
 #### web
-[![asciicast](https://asciinema.org/a/D1F3SV50yp4v6IEbw7zRtHu2G.svg)](https://asciinema.org/a/D1F3SV50yp4v6IEbw7zRtHu2G)
+- [Athenz Bootstrap Demo](https://asciinema.org/a/Q4fxxR6iY88TQCTSpvyYbrCFN)
 
 <a id="markdown-docker" name="docker"></a>
 #### docker
@@ -35,7 +35,14 @@ docker run --rm -ti \
   -v "$HOME/.config/asciinema":/root/.config/asciinema \
   -v "${CAST_DIR}":/root/cast \
   asciinema/asciinema \
+  asciinema play --speed=99 /root/cast/athenz-docker-build-demo.cast
+
+docker run --rm -ti \
+  -v "$HOME/.config/asciinema":/root/.config/asciinema \
+  -v "${CAST_DIR}":/root/cast \
+  asciinema/asciinema \
   asciinema play --speed=3 /root/cast/athenz-bootstrap-demo.cast
+
 ```
 
 <a id="markdown-recording" name="recording"></a>
