@@ -37,7 +37,7 @@ echo '2. create the self-signed CAs' | colored_cat g
 sh "${DEV_CA_DIR}/create-self-signed-ca.sh"
 
 echo '3. create self-signed Athenz domain admin user certificate' | colored_cat g
-echo "your setting DEV_DOMAIN_ADMIN=${DEV_DOMAIN_ADMIN}" | colored_cat y
+echo "your setting: DEV_DOMAIN_ADMIN=${DEV_DOMAIN_ADMIN}" | colored_cat y
 sh "${DEV_DOMAIN_ADMIN_DIR}/create-self-signed-user-cert.sh"
 
 echo '4. create ZMS server certificate' | colored_cat g

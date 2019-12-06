@@ -259,15 +259,16 @@ DATA='{"name": "sys.auth.zts","publicKeys": [{"id": "0","key": "'"${ENCODED_ZTS_
 
 # add ZTS service using ZMS API
 ZMS_URL="https://${ZMS_HOST}:${ZMS_PORT}"
-curl -k --request PUT \
-    --cacert "${SAMPLE_DIR}/${ATHENZ_CA_PATH}" \
+curl --silent --request PUT \
+    --cacert "${ATHENZ_CA_PATH}" \
     --key "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
     --cert "${DOMAIN_ADMIN_CERT_PATH}" \
     --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts" \
     --header 'content-type: application/json' \
     --data "${DATA}"
 # verify
-curl -k --request GET \
+curl --silent --request GET \
+    --cacert "${ATHENZ_CA_PATH}" \
     --key "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
     --cert "${DOMAIN_ADMIN_CERT_PATH}" \
     --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"; echo '';
@@ -316,7 +317,7 @@ llt | tail
 # grep "${ZTS_HOST}" /etc/hosts && echo '/etc/hosts already set' || sudo sed -i "$ a\127.0.0.1 ${ZTS_HOST}" /etc/hosts
 
 # ZTS health check
-curl -v "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"; echo '';
+curl -v --silent "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"; echo '';
 ```
 
 <a id="markdown-appendix" name="appendix"></a>

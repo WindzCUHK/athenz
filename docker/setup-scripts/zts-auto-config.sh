@@ -108,7 +108,7 @@ DATA='{"name": "sys.auth.zts","publicKeys": [{"id": "0","key": "'"${ENCODED_ZTS_
 
 # add ZTS service using ZMS API
 ZMS_URL="https://${ZMS_HOST}:${ZMS_PORT}"
-curl -k --request PUT \
+curl --silent --request PUT \
     --cacert "${ATHENZ_CA_PATH}" \
     --key "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
     --cert "${DOMAIN_ADMIN_CERT_PATH}" \
@@ -116,7 +116,7 @@ curl -k --request PUT \
     --header 'content-type: application/json' \
     --data "${DATA}"
 # verify
-curl -k --request GET \
+curl --silent --request GET \
     --key "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
     --cert "${DOMAIN_ADMIN_CERT_PATH}" \
     --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"; echo '';
@@ -157,5 +157,5 @@ echo 'add ZTS host' | colored_cat y
 
 echo 'ZTS health check' | colored_cat y
 {
-    curl -v "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"; echo '';
+    curl -v --silent "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"; echo '';
 } | colored_cat w

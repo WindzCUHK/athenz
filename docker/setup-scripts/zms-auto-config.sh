@@ -71,7 +71,7 @@ openssl pkcs12 -export -noiter -nomaciter \
     -in "${ZMS_CERT_PATH}" -inkey "${ZMS_CERT_KEY_PATH}"
 
 echo '6. config the Athenz domain admin' | colored_cat g
-echo "your setting DOMAIN_ADMIN=${DOMAIN_ADMIN}" | colored_cat y
+echo "your setting: DOMAIN_ADMIN=${DOMAIN_ADMIN}" | colored_cat y
 sed -i "s/user.github-1234567/${DOMAIN_ADMIN}/g" "${ZMS_CONF_DIR}/zms.properties"
 
 echo '7. summary' | colored_cat g
@@ -105,14 +105,14 @@ echo 'add ZMS host' | colored_cat y
 
 echo 'ZMS health check' | colored_cat y
 {
-    curl -v "http://${ZMS_HOST}:${ZMS_PORT}/zms/v1/status"; echo '';
+    curl -v --silent "http://${ZMS_HOST}:${ZMS_PORT}/zms/v1/status"; echo '';
 } | colored_cat w
 
 
 echo 'get domains' | colored_cat y
 {
     ZMS_URL="https://${ZMS_HOST}:${ZMS_PORT}"
-    curl \
+    curl --silent \
         --cacert "${ATHENZ_CA_PATH}" \
         --key "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
         --cert "${DOMAIN_ADMIN_CERT_PATH}" \
