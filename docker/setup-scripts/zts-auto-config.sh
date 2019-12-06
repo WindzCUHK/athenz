@@ -117,6 +117,7 @@ curl --silent --request PUT \
     --data "${DATA}"
 # verify
 curl --silent --request GET \
+    --cacert "${ATHENZ_CA_PATH}" \
     --key "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
     --cert "${DOMAIN_ADMIN_CERT_PATH}" \
     --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"; echo '';
