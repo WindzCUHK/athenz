@@ -120,8 +120,11 @@ git reset --hard HEAD; git clean -fdx
 <a id="markdown-todo" name="todo"></a>
 ### TODO
 
-1. [WIP] create ZMS & ZTS DB admin user, reference: [setup_zms_prod](https://yahoo.github.io/athenz/site/setup_zms_prod/#mysql-server)
-1. rebase to v1.8.39
+1. ~create ZMS & ZTS DB admin user, reference: [setup_zms_prod](https://yahoo.github.io/athenz/site/setup_zms_prod/#mysql-server)~
+1. ~change docker run user~
+1. ~rebase to v1.8.40~
+1. [WIP] recording
+1. [WIP] remove old docs
 1. add JWT Authority properties
 1. provide CSR template for requesting certificate from public CA
     1. maybe better to split `usr_cert` section in `self-sign.cnf` to 1 more `server_cert` for server certificate

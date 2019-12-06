@@ -27,7 +27,7 @@ BASE_DIR="`git rev-parse --show-toplevel`"
 source "${BASE_DIR}/docker/env.sh"
 if [ -f './dev-env-exports.sh' ]; then
     source './dev-env-exports.sh'
-    echo 'Be careful! You are using the DEV settings !!!'
+    echo 'Be careful! You are using the DEV settings in dev-env-exports.sh !!!' | colored_cat p
 fi
 
 ### ----------------------------------------------------------------
@@ -119,9 +119,8 @@ curl -k --request PUT \
 curl -k --request GET \
     --key "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
     --cert "${DOMAIN_ADMIN_CERT_PATH}" \
-    --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"
+    --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"; echo '';
 
-echo ''
 echo '10. create athenz.conf' | colored_cat g
 docker run --rm --network="${DOCKER_NETWORK}" \
     --user "$(id -u):$(id -g)" \
@@ -149,10 +148,14 @@ alias llm="less ${DOCKER_DIR}/logs/zms/server.log"
 alias llt="less ${DOCKER_DIR}/logs/zts/server.log"
 alias llmf="less -f ${DOCKER_DIR}/logs/zms/server.log"
 alias lltf="less -f ${DOCKER_DIR}/logs/zts/server.log"
-llt | tail
+llt | tail | colored_cat w
 
 echo 'add ZTS host' | colored_cat y
-grep "${ZTS_HOST}" /etc/hosts && echo '/etc/hosts already set' || sudo sed -i "$ a\127.0.0.1 ${ZTS_HOST}" /etc/hosts
+{
+    grep "${ZTS_HOST}" /etc/hosts && echo '/etc/hosts already set' || sudo sed -i "$ a\127.0.0.1 ${ZTS_HOST}" /etc/hosts
+} | colored_cat w
 
 echo 'ZTS health check' | colored_cat y
-curl -v "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"
+{
+    curl -v "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"; echo '';
+} | colored_cat w

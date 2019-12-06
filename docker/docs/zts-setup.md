@@ -270,7 +270,7 @@ curl -k --request PUT \
 curl -k --request GET \
     --key "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
     --cert "${DOMAIN_ADMIN_CERT_PATH}" \
-    --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"
+    --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"; echo '';
 ```
 
 <a id="markdown-10-create-athenzconf" name="10-create-athenzconf"></a>
@@ -316,7 +316,7 @@ llt | tail
 # grep "${ZTS_HOST}" /etc/hosts && echo '/etc/hosts already set' || sudo sed -i "$ a\127.0.0.1 ${ZTS_HOST}" /etc/hosts
 
 # ZTS health check
-curl -v "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"
+curl -v "http://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"; echo '';
 ```
 
 <a id="markdown-appendix" name="appendix"></a>
