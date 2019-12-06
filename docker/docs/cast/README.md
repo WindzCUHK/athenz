@@ -46,7 +46,7 @@ BASE_DIR="`git rev-parse --show-toplevel`"
 CAST_DIR="${BASE_DIR}/docker/docs/cast"
 
 asciinema rec --title='Athenz Docker Build Demo' "${CAST_DIR}/athenz-docker-build-demo.cast"
-# cd "`git rev-parse --show-toplevel`/docker"; make build;
+# cd "`git rev-parse --show-toplevel`/docker"; make build; exit;
 
 asciinema rec --title='Athenz Bootstrap Demo' "${CAST_DIR}/athenz-bootstrap-demo.cast"
 # sh "`git rev-parse --show-toplevel`/docker/docs/cast/bootstrap-demo-welcome-script.sh"
@@ -62,6 +62,6 @@ asciinema rec --title='Athenz Bootstrap Demo' "${CAST_DIR}/athenz-bootstrap-demo
     ```bash
     cd $HOME
     git clone https://github.com/asciinema/asciinema.git
-    export PYTHONPATH="$PYTHONPATH:$HOME/asciinema"
+    export PYTHONPATH="${PYTHONPATH:-}:$HOME/asciinema"
     alias asciinema='python3 -m asciinema'
     ```
