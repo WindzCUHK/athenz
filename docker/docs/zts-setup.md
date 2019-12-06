@@ -284,8 +284,7 @@ docker run --rm --network="${DOCKER_NETWORK}" \
     -v "${DOMAIN_ADMIN_CERT_PATH}:/etc/domain-admin/cert.pem" \
     -v "${ATHENZ_CA_PATH}:/etc/certs/athenz_ca.pem" \
     -v "${ZTS_CONF_DIR}:/zts/conf" \
-    --name athenz-cli-util athenz-cli-util \
-    ./utils/athenz-conf/target/linux/athenz-conf \
+    --name athenz-conf athenz-conf \
     -svc-key-file /etc/domain-admin/key.pem \
     -svc-cert-file /etc/domain-admin/cert.pem \
     -c /etc/certs/athenz_ca.pem \

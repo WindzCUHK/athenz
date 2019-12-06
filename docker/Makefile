@@ -7,28 +7,29 @@ build:
 	DOCKER_BUILDKIT=1 docker build -t athenz-ui -f ./ui/Dockerfile ../ui
 	DOCKER_BUILDKIT=1 docker build -t athenz-zms-db -f ./db/zms/Dockerfile ../servers/zms/schema
 	DOCKER_BUILDKIT=1 docker build -t athenz-zts-db -f ./db/zts/Dockerfile ../servers/zts/schema
-	DOCKER_BUILDKIT=1 docker build -t athenz-zms-cli -f ./util/zms-cli/Dockerfile ../
-	DOCKER_BUILDKIT=1 docker build -t athenz-cli-util -f ./util/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build -t athenz-conf -f ./util/athenz-conf/Dockerfile ../
+	# DOCKER_BUILDKIT=1 docker build -t athenz-zms-cli -f ./util/zms-cli/Dockerfile ../
+	# DOCKER_BUILDKIT=1 docker build -t athenz-cli-util -f ./util/Dockerfile ../
 
-setup-dev-config:
-	sh ./setup-scripts/all-in-one.dev.sh
+# setup-dev-config:
+# 	sh ./setup-scripts/all-in-one.dev.sh
 setup-docker-network:
 	docker network create --subnet 172.21.0.0/16 $${DOCKER_NETWORK:-athenz}
 
-run-docker-dev: run-zms-dev run-zts run-ui
-run-zms-dev:
-	sh ./deploy-scripts/1.1.deploy-ZMS.sh
-	sh ./deploy-scripts/1.2.config-zms-domain-admin.dev.sh
-	echo '"run-zms-dev" step DONE!'
-run-zts:
-	sh ./deploy-scripts/2.1.register-ZTS-service.sh
-	sh ./deploy-scripts/2.2.create-athenz-conf.sh
-	sh ./deploy-scripts/2.3.deploy-ZTS.sh
-	echo '"run-zms" step DONE!'
-run-ui:
-	sh ./deploy-scripts/3.1.register-UI-service.sh
-	sh ./deploy-scripts/3.2.deploy-UI.sh
-	echo '"run-ui" step DONE!'
+# run-docker-dev: run-zms-dev run-zts run-ui
+# run-zms-dev:
+# 	sh ./deploy-scripts/1.1.deploy-ZMS.sh
+# 	sh ./deploy-scripts/1.2.config-zms-domain-admin.dev.sh
+# 	echo '"run-zms-dev" step DONE!'
+# run-zts:
+# 	sh ./deploy-scripts/2.1.register-ZTS-service.sh
+# 	sh ./deploy-scripts/2.2.create-athenz-conf.sh
+# 	sh ./deploy-scripts/2.3.deploy-ZTS.sh
+# 	echo '"run-zms" step DONE!'
+# run-ui:
+# 	sh ./deploy-scripts/3.1.register-UI-service.sh
+# 	sh ./deploy-scripts/3.2.deploy-UI.sh
+# 	echo '"run-ui" step DONE!'
 
 remove-all: remove-containers remove-networks remove-files
 remove-containers:
@@ -50,5 +51,6 @@ clean: remove-all
 	docker image rm athenz-ui || true
 	docker image rm athenz-zms-db || true
 	docker image rm athenz-zts-db || true
-	docker image rm athenz-zms-cli || true
-	docker image rm athenz-cli-util || true
+	docker image rm athenz-conf || true
+	# docker image rm athenz-zms-cli || true
+	# docker image rm athenz-cli-util || true
