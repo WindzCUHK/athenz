@@ -50,3 +50,17 @@ CMD [ \
   # main class
   "com.yahoo.athenz.container.AthenzJettyContainer" \
 ]
+
+# ENV for healthcheck
+ENV ZTS_PORT='8443'
+ENV ZTS_HC_TRUSTSTORE_PATH='/opt/athenz/zts/var/certs/zts_truststore.jks'
+ENV ZTS_HC_TRUSTSTORE_TYPE='JKS'
+ENV ZTS_HC_TRUSTSTORE_PASS="${ZTS_TRUSTSTORE_PASS}"
+
+HEALTHCHECK --interval=1m --timeout=3s --start-period=30s --retries=3 \
+  CMD java \
+  -classpath /opt/athenz/zts/lib/jars \
+  "-Djavax.net.ssl.trustStore=${ZTS_HC_TRUSTSTORE_PATH}" \
+  "-Djavax.net.ssl.trustStoreType=${ZTS_HC_TRUSTSTORE_TYPE}" \
+  "-Djavax.net.ssl.trustStorePassword=${ZTS_HC_TRUSTSTORE_PASS}" \
+  JavaHttpsClient zts "${ZTS_PORT}"

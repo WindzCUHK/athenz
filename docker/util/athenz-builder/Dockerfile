@@ -25,8 +25,8 @@ RUN tar xvzf ./assembly/zts/target/athenz-zts*-bin.tar.gz -C /tmp/zts \
     && mv /tmp/zts/webapps /opt/athenz/zts/webapps
 
 RUN javac -d /tmp /athenz/docker/util/java-https-client/JavaHttpsClient.java \
-    && cp /tmp/JavaHttpsClient.class /opt/athenz/zms/lib/jars
-    && cp /tmp/JavaHttpsClient.class /opt/athenz/zts/lib/jars
+    && cp /tmp/JavaHttpsClient.class /opt/athenz/zms/lib/jars \
+    && cp /tmp/JavaHttpsClient.class /opt/athenz/zts/lib/jars \
     && rm /tmp/JavaHttpsClient.class
 
 WORKDIR /opt/athenz

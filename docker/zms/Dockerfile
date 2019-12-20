@@ -38,3 +38,17 @@ CMD [ \
   # main class
   "com.yahoo.athenz.container.AthenzJettyContainer" \
 ]
+
+# ENV for healthcheck
+ENV ZMS_PORT='8443'
+ENV ZMS_HC_TRUSTSTORE_PATH='/opt/athenz/zms/var/certs/zms_truststore.jks'
+ENV ZMS_HC_TRUSTSTORE_TYPE='JKS'
+ENV ZMS_HC_TRUSTSTORE_PASS="${ZMS_TRUSTSTORE_PASS}"
+
+HEALTHCHECK --interval=1m --timeout=3s --start-period=30s --retries=3 \
+  CMD java \
+  -classpath /opt/athenz/zms/lib/jars \
+  "-Djavax.net.ssl.trustStore=${ZMS_HC_TRUSTSTORE_PATH}" \
+  "-Djavax.net.ssl.trustStoreType=${ZMS_HC_TRUSTSTORE_TYPE}" \
+  "-Djavax.net.ssl.trustStorePassword=${ZMS_HC_TRUSTSTORE_PASS}" \
+  JavaHttpsClient zms "${ZMS_PORT}"
