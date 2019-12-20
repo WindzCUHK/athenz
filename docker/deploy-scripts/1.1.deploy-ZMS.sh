@@ -82,6 +82,7 @@ docker run -d -h "${ZMS_HOST}" \
   -e "ZMS_DB_ADMIN_PASS=${ZMS_DB_ADMIN_PASS}" \
   -e "ZMS_KEYSTORE_PASS=${ZMS_KEYSTORE_PASS}" \
   -e "ZMS_TRUSTSTORE_PASS=${ZMS_TRUSTSTORE_PASS}" \
+  -e "ZMS_PORT=${ZMS_PORT}" \
   --name "${ZMS_HOST}" athenz-zms-server
 
 # wait for ZMS to be ready

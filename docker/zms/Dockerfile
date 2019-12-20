@@ -40,12 +40,12 @@ CMD [ \
 ]
 
 # ENV for healthcheck
-ENV ZMS_PORT='8443'
+ENV ZMS_PORT='4443'
 ENV ZMS_HC_TRUSTSTORE_PATH='/opt/athenz/zms/var/certs/zms_truststore.jks'
 ENV ZMS_HC_TRUSTSTORE_TYPE='JKS'
 ENV ZMS_HC_TRUSTSTORE_PASS="${ZMS_TRUSTSTORE_PASS}"
 
-HEALTHCHECK --interval=1m --timeout=3s --start-period=30s --retries=3 \
+HEALTHCHECK --interval=1m --timeout=3s --start-period=10s --retries=3 \
   CMD java \
   -classpath /opt/athenz/zms/lib/jars \
   "-Djavax.net.ssl.trustStore=${ZMS_HC_TRUSTSTORE_PATH}" \

@@ -86,6 +86,7 @@ docker run -d -h "${ZTS_HOST}" \
   -e "ZTS_SIGNER_TRUSTSTORE_PASS=${ZTS_SIGNER_TRUSTSTORE_PASS}" \
   -e "ZMS_CLIENT_KEYSTORE_PASS=${ZMS_CLIENT_KEYSTORE_PASS}" \
   -e "ZMS_CLIENT_TRUSTSTORE_PASS=${ZMS_CLIENT_TRUSTSTORE_PASS}" \
+  -e "ZTS_PORT=${ZTS_PORT}" \
   --name "${ZTS_HOST}" athenz-zts-server
 
 # wait for ZTS to be ready
