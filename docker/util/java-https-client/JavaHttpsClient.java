@@ -36,15 +36,7 @@ public class JavaHttpsClient {
 
 			// disable hostname checking
 			final HostnameVerifier defaultHv = HttpsURLConnection.getDefaultHostnameVerifier();
-			HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-				@Override
-				public boolean verify(String hostname, SSLSession session) {
-					if ("127.0.0.1".equals(hostname)) {
-						return true;
-					}
-					return defaultHv.verify(hostname, session);
-				}
-			});
+			HttpsURLConnection.setDefaultHostnameVerifier(new LocalhostHostnameVerifier(defaultHv));
 
 			// HTTPS GET
 			URL statusUrl = new URL(String.format("https://127.0.0.1:%d/%s/v1/status", port, apiType));
@@ -76,4 +68,19 @@ public class JavaHttpsClient {
 		System.exit(1);
 	}
 
+}
+
+class LocalhostHostnameVerifier implements HostnameVerifier {
+	private HostnameVerifier defaultHv;
+	public LocalhostHostnameVerifier(HostnameVerifier defaultHv) {
+		this.defaultHv = defaultHv;
+	}
+
+	@Override
+	public boolean verify(String hostname, SSLSession session) {
+		if ("127.0.0.1".equals(hostname)) {
+			return true;
+		}
+		return defaultHv.verify(hostname, session);
+	}
 }
