@@ -32,8 +32,20 @@ public class JavaHttpsClient {
 			}
 			int port = Integer.valueOf(args[1]);
 
+			// disable hostname checking
+			final HostnameVerifier defaultHv = HttpsURLConnection.getDefaultHostnameVerifier()
+			HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+				@Override
+				public boolean verify(String hostname, SSLSession session) {
+					if ("127.0.0.1".equals(hostname)) {
+						return true;
+					}
+					return defaultHv.verify(hostname, session);
+				}
+			});
+
 			// HTTPS GET
-			URL statusUrl = new URL(String.format("https://localhost:%d/%s/v1/status", port, apiType));
+			URL statusUrl = new URL(String.format("https://127.0.0.1:%d/%s/v1/status", port, apiType));
 			HttpsURLConnection https = (HttpsURLConnection) statusUrl.openConnection();
 			if (https.getResponseCode() == 200) {
 				System.exit(0);
