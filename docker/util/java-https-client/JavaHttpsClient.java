@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 public class JavaHttpsClient {
 
@@ -24,16 +26,16 @@ public class JavaHttpsClient {
 		try {
 			// check args
 			if (args.length != 2) {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("args.length != 2");
 			}
 			String apiType = args[0];
 			if (!"zms".equals(apiType) && !"zts".equals(apiType)) {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("NOT <zms|zts>");
 			}
 			int port = Integer.valueOf(args[1]);
 
 			// disable hostname checking
-			final HostnameVerifier defaultHv = HttpsURLConnection.getDefaultHostnameVerifier()
+			final HostnameVerifier defaultHv = HttpsURLConnection.getDefaultHostnameVerifier();
 			HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
 				@Override
 				public boolean verify(String hostname, SSLSession session) {
@@ -46,15 +48,30 @@ public class JavaHttpsClient {
 
 			// HTTPS GET
 			URL statusUrl = new URL(String.format("https://127.0.0.1:%d/%s/v1/status", port, apiType));
-			HttpsURLConnection https = (HttpsURLConnection) statusUrl.openConnection();
-			if (https.getResponseCode() == 200) {
-				System.exit(0);
+			HttpsURLConnection conn = (HttpsURLConnection) statusUrl.openConnection();
+			String responseBody;
+			if (conn.getResponseCode() == 200) {
+				try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));) {
+					while((responseBody = br.readLine()) != null) {
+						System.out.println(responseBody);
+					}
+					System.exit(0);
+				}
+			}
+
+			// print error
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));) {
+				while((responseBody = br.readLine()) != null) {
+					System.err.println(responseBody);
+				}
 			}
 
 		} catch (RuntimeException | MalformedURLException ex) {
-			// print usage
-			System.out.println("Usage: java com.yahoo.athenz.docker.JavaHttpsClient <zms|zts> <server_port>");
-		} catch (IOException ex) {}
+			System.err.println(ex.getMessage());
+			System.err.println("Usage: java com.yahoo.athenz.docker.JavaHttpsClient <zms|zts> <server_port>");
+		} catch (IOException ex) {
+			System.err.println(ex.getMessage());
+		}
 
 		System.exit(1);
 	}
