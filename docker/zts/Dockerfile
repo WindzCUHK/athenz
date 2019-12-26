@@ -1,6 +1,6 @@
 FROM athenz-builder AS builder
 
-FROM openjdk:8-jre-alpine
+FROM adoptopenjdk/openjdk8:alpine-jre
 
 ARG GID=1001
 ARG UID=10001
@@ -53,14 +53,8 @@ CMD [ \
 
 # ENV for healthcheck
 ENV ZTS_PORT='8443'
-ENV ZTS_HC_TRUSTSTORE_PATH='/opt/athenz/zts/var/certs/zts_truststore.jks'
-ENV ZTS_HC_TRUSTSTORE_TYPE='JKS'
-ENV ZTS_HC_TRUSTSTORE_PASS="${ZTS_TRUSTSTORE_PASS}"
 
 HEALTHCHECK --interval=1m --timeout=3s --start-period=10s --retries=3 \
-  CMD java \
-  -classpath /opt/athenz/zts/lib/jars \
-  "-Djavax.net.ssl.trustStore=${ZTS_HC_TRUSTSTORE_PATH}" \
-  "-Djavax.net.ssl.trustStoreType=${ZTS_HC_TRUSTSTORE_TYPE}" \
-  "-Djavax.net.ssl.trustStorePassword=${ZTS_HC_TRUSTSTORE_PASS}" \
-  JavaHttpsClient zts "${ZTS_PORT}"
+  CMD wget -O - --quiet --tries=1 --no-check-certificate \
+  "https://127.0.0.1:${ZTS_PORT}/zts/v1/status" \
+  || exit 1

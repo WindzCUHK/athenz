@@ -1,6 +1,6 @@
 FROM athenz-builder AS builder
 
-FROM openjdk:8-jre-alpine
+FROM adoptopenjdk/openjdk8:alpine-jre
 
 ARG GID=1001
 ARG UID=10001
@@ -41,14 +41,8 @@ CMD [ \
 
 # ENV for healthcheck
 ENV ZMS_PORT='4443'
-ENV ZMS_HC_TRUSTSTORE_PATH='/opt/athenz/zms/var/certs/zms_truststore.jks'
-ENV ZMS_HC_TRUSTSTORE_TYPE='JKS'
-ENV ZMS_HC_TRUSTSTORE_PASS="${ZMS_TRUSTSTORE_PASS}"
 
 HEALTHCHECK --interval=1m --timeout=3s --start-period=10s --retries=3 \
-  CMD java \
-  -classpath /opt/athenz/zms/lib/jars \
-  "-Djavax.net.ssl.trustStore=${ZMS_HC_TRUSTSTORE_PATH}" \
-  "-Djavax.net.ssl.trustStoreType=${ZMS_HC_TRUSTSTORE_TYPE}" \
-  "-Djavax.net.ssl.trustStorePassword=${ZMS_HC_TRUSTSTORE_PASS}" \
-  JavaHttpsClient zms "${ZMS_PORT}"
+  CMD wget -O - --quiet --tries=1 --no-check-certificate \
+  "https://127.0.0.1:${ZMS_PORT}/zms/v1/status" \
+  || exit 1
