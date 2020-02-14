@@ -7,6 +7,7 @@ COPY --from=athenz-conf /usr/bin/athenz-conf /usr/bin/athenz-conf
 RUN apk update && \
     apk add --no-cache git && \
     apk add --no-cache curl && \
+    apk add --no-cache tree && \
     apk add --no-cache openssl && \
     rm -rf /var/cache/apk/*
 
