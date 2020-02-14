@@ -14,4 +14,4 @@ RUN apk update && \
 WORKDIR /athenz
 
 ENTRYPOINT [ "sh" ]
-CMD [ "echo", "docker image for Athenz setup" ]
+CMD [ "-c", "echo This is a docker image for Athenz setup" ]
