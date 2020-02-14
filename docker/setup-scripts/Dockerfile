@@ -2,7 +2,7 @@ FROM athenz-conf AS athenz-conf
 
 FROM adoptopenjdk/openjdk8:alpine-jre
 
-COPY --from=builder /usr/bin/athenz-conf /usr/bin/athenz-conf
+COPY --from=athenz-conf /usr/bin/athenz-conf /usr/bin/athenz-conf
 
 RUN apk update && \
     apk add --no-cache git && \
