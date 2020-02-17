@@ -104,6 +104,7 @@ tree "${PROD_ZTS_DIR}"
 tree "${ZTS_DIR}"
 
 echo '9. register ZTS service to Athenz' | colored_cat g
+# encode public key in ybase64, reference: https://github.com/yahoo/athenz/blob/545d9487a866cad10ba864b435bdb7ece390d4bf/libs/java/auth_core/src/main/java/com/yahoo/athenz/auth/util/Crypto.java#L334-L343
 ENCODED_ZTS_PUBLIC_KEY=`base64 -w 0 "${ZTS_PUBLIC_KEY_PATH}" | tr '\+\=\/' '\.\-\_'`
 
 DATA='{"name": "sys.auth.zts","publicKeys": [{"id": "0","key": "'"${ENCODED_ZTS_PUBLIC_KEY}"'"}]}'
@@ -125,7 +126,6 @@ curl --silent --request GET \
     --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"; echo '';
 
 echo '10. create athenz.conf' | colored_cat g
-# run athenz-conf command directly without docker
 athenz-conf \
     -svc-key-file "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
     -svc-cert-file "${DOMAIN_ADMIN_CERT_PATH}" \
