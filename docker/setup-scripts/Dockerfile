@@ -5,6 +5,7 @@ FROM adoptopenjdk/openjdk8:alpine-jre
 COPY --from=athenz-conf /usr/bin/athenz-conf /usr/bin/athenz-conf
 
 RUN apk update && \
+    apk add --no-cache ncurses && \
     apk add --no-cache git && \
     apk add --no-cache curl && \
     apk add --no-cache tree && \
