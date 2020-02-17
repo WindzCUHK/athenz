@@ -261,7 +261,7 @@ ls -l "${DOMAIN_ADMIN_CERT_PATH}"
 ```
 - Add ZTS service using ZMS API
 ```bash
-# get encoded ZTS public key string
+# encode public key in ybase64, reference: https://github.com/yahoo/athenz/blob/545d9487a866cad10ba864b435bdb7ece390d4bf/libs/java/auth_core/src/main/java/com/yahoo/athenz/auth/util/Crypto.java#L334-L343
 ENCODED_ZTS_PUBLIC_KEY=`base64 -w 0 "${ZTS_PUBLIC_KEY_PATH}" | tr '\+\=\/' '\.\-\_'`
 # ENCODED_ZTS_PUBLIC_KEY=`base64 -w 0 "${ZTS_PUBLIC_KEY_PATH}" | sed 's/+/./g; s/=/-/g; s:_:/:g'`
 # decode: cat <file> | tr '\.\-\_' '\+\=\/' | base64 -d
