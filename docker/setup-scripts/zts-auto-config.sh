@@ -22,13 +22,16 @@ cat <<'EOF' | colored_cat c
 
 EOF
 
-# set up env. secretly
+# set up env.
 BASE_DIR="`git rev-parse --show-toplevel`"
 source "${BASE_DIR}/docker/env.sh"
-if [ -f './dev-env-exports.sh' ]; then
-    source './dev-env-exports.sh'
+echo "Done loading ENV. from ${BASE_DIR}/docker/env.sh" | colored_cat p
+if [ -f "${DOCKER_DIR}/setup-scripts/dev-env-exports.sh" ]; then
+    source "${DOCKER_DIR}/setup-scripts/dev-env-exports.sh"
     echo 'Be careful! You are using the DEV settings in dev-env-exports.sh !!!' | colored_cat p
 fi
+
+
 
 ### ----------------------------------------------------------------
 echo ''
