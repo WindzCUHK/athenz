@@ -104,8 +104,7 @@ tree "${PROD_ZTS_DIR}"
 tree "${ZTS_DIR}"
 
 echo '9. register ZTS service to Athenz' | colored_cat g
-ENCODED_ZTS_PUBLIC_KEY=`base64 -w 0 "${ZTS_PUBLIC_KEY_PATH}" | tr '\+\=\/' '
-\.\-\_'`
+ENCODED_ZTS_PUBLIC_KEY=`base64 -w 0 "${ZTS_PUBLIC_KEY_PATH}" | tr '\+\=\/' '\.\-\_'`
 
 DATA='{"name": "sys.auth.zts","publicKeys": [{"id": "0","key": "'"${ENCODED_ZTS_PUBLIC_KEY}"'"}]}'
 

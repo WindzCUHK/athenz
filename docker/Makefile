@@ -3,6 +3,8 @@ GID=$(DOCKER_GID)
 UID=$(DOCKER_UID)
 GID_ARG := $(if $(GID),--build-arg GID=$(GID),--build-arg GID)
 UID_ARG := $(if $(UID),--build-arg UID=$(UID),--build-arg UID)
+# docker network name
+DOCKER_NETWORK="$${DOCKER_NETWORK:-athenz}"
 
 build:
 	DOCKER_BUILDKIT=1 docker build -t rdl-athenz-server -f ./util/rdl-athenz-server/Dockerfile ../rdl/rdl-gen-athenz-server
@@ -24,21 +26,21 @@ deploy-dev:
 	# ZMS
 	docker run --rm -t -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/setup-scripts/zms-auto-config.sh
 	sh "./deploy-scripts/zms-deploy.sh"
-	docker run --rm -t --network="$${DOCKER_NETWORK:-athenz}" -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/deploy-scripts/zms-debug.sh
+	docker run --rm -t --network="$(DOCKER_NETWORK)" -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/deploy-scripts/zms-debug.sh
 	# ZTS
-	docker run --rm -t -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/setup-scripts/zts-auto-config.sh
+	docker run --rm -t --network="$(DOCKER_NETWORK)" -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/setup-scripts/zts-auto-config.sh
 	sh "./deploy-scripts/zts-deploy.sh"
-	docker run --rm -t --network="$${DOCKER_NETWORK:-athenz}" -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/deploy-scripts/zts-debug.sh
+	docker run --rm -t --network="$(DOCKER_NETWORK)" -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/deploy-scripts/zts-debug.sh
 
 setup-docker-network:
-	docker network create --subnet $${DOCKER_NETWORK_SUBNET:-172.21.0.0/16} $${DOCKER_NETWORK:-athenz}
+	docker network create --subnet $${DOCKER_NETWORK_SUBNET:-172.21.0.0/16} $(DOCKER_NETWORK)
 
 remove-all: remove-containers remove-networks remove-files
 remove-containers:
 	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker stop
 	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker rm
 remove-networks:
-	docker network rm $${DOCKER_NETWORK:-athenz} || true
+	docker network rm $(DOCKER_NETWORK) || true
 remove-files:
 	# rm -rf ./jars
 	rm -rf ./logs
