@@ -4,7 +4,10 @@ FROM adoptopenjdk/openjdk8:alpine-jre
 
 COPY --from=athenz-conf /usr/bin/athenz-conf /usr/bin/athenz-conf
 
+# coreutils: base64
+# ncurses: tput
 RUN apk update && \
+    apk add --no-cache coreutils && \
     apk add --no-cache ncurses && \
     apk add --no-cache git && \
     apk add --no-cache curl && \
