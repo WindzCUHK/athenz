@@ -15,7 +15,14 @@
 <a id="markdown-prerequisites" name="prerequisites"></a>
 ## Prerequisites
 
-All the commands below are expected to run inside [athenz-setup-env](../setup-scripts/Dockerfile) container.
+All the setup commands below are expected to run inside [athenz-setup-env](../setup-scripts/Dockerfile) container.
+```bash
+docker run --rm -it \
+    -v "${BASE_DIR}:/athenz" \
+    --user "$(id -u):$(id -g)" \
+    athenz-setup-env \
+    sh
+```
 
 <a id="markdown-prepare-certificates" name="prepare-certificates"></a>
 ## Prepare certificates
@@ -78,6 +85,7 @@ All the commands below are expected to run inside [athenz-setup-env](../setup-sc
 ## Overwrite env., and continue the setup
 
 ```bash
+cat <<EOF > "${DOCKER_DIR}/setup-scripts/dev-env-exports.sh"
 # CAs
 export CA_DIR="${DEV_CA_DIR}"
 export ATHENZ_CA_PATH="${DEV_ATHENZ_CA_PATH}"
@@ -104,6 +112,7 @@ export ZTS_SIGNER_CERT_PATH="${DEV_ZTS_SIGNER_CERT_PATH}"
 export ZMS_CLIENT_CERT_KEY_PATH="${DEV_ZMS_CLIENT_CERT_KEY_PATH}"
 # export ZMS_CLIENT_CERT_PATH="${DEV_ZMS_CLIENT_CERT_PATH}"
 export ZMS_CLIENT_CERT_PATH="${DEV_ZMS_CLIENT_CERT_BUNDLE_PATH}"
+EOF
 ```
 
 <a id="markdown-appendix" name="appendix"></a>
