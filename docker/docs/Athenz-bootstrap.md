@@ -56,7 +56,9 @@ In Athenz, we often have 3 types of CA:
 <a id="markdown-bootstrap-steps" name="bootstrap-steps"></a>
 ## Bootstrap steps
 
-> If you just want to try out Athenz, please follow [try-out-Athenz-with-self-signed-CA](./try-out-Athenz-with-self-signed-CA.md) and then skip the next step (go to step 4).
+> If you just want to try out Athenz, please jump to [automation-shortcut](#automation-shortcut) section.
+> 
+> For details, please read [try-out-Athenz-with-self-signed-CA](./try-out-Athenz-with-self-signed-CA.md) and then start from step 4 (Set up ZMS).
 
 1. Ask your CA to sign the following certificates
     - Athenz CA
@@ -67,7 +69,7 @@ In Athenz, we often have 3 types of CA:
     - Service CA
         - Intermediate CA certificate for ZTS certificate signer
         - ZTS client certificate
-1. Set up your deployment environment with [env.sh](../env.sh)
+1. Set up your deployment environment with [env.sh](../env.sh) (you may want to modify it beforehand)
     ```bash
     BASE_DIR="`git rev-parse --show-toplevel`"
 
@@ -101,15 +103,50 @@ In Athenz, we often have 3 types of CA:
 <a id="markdown-automation-shortcut" name="automation-shortcut"></a>
 ### automation shortcut
 
+same as `make deploy-dev`
 ```bash
-# make deploy-dev
-
 BASE_DIR="`git rev-parse --show-toplevel`"
-SETUP_DIR="${BASE_DIR}/docker/setup-scripts"
+source "${BASE_DIR}/docker/env.sh"
 
-sh "${SETUP_DIR}/self-signed-certificates.sh"
-sh "${SETUP_DIR}/zms-auto-config.sh"
-sh "${SETUP_DIR}/zts-auto-config.sh"
+# generate self-signed certificates
+docker run --rm -t \
+    -v "${BASE_DIR}:/athenz" \
+    --user "$(id -u):$(id -g)" \
+    athenz-setup-env \
+    sh /athenz/docker/setup-scripts/self-signed-certificates.sh
+
+# ZMS config
+docker run --rm -t \
+    -v "${BASE_DIR}:/athenz" \
+    --user "$(id -u):$(id -g)" \
+    athenz-setup-env \
+    sh /athenz/docker/setup-scripts/zms-auto-config.sh
+# ZMS deploy
+sh "${DOCKER_DIR}/deploy-scripts/zms-deploy.sh"
+# ZMS debug
+docker run --rm -t \
+    --network="${DOCKER_NETWORK}" \
+    -v "${BASE_DIR}:/athenz" \
+    --user "$(id -u):$(id -g)" \
+    athenz-setup-env \
+    sh /athenz/docker/deploy-scripts/zms-debug.sh
+
+# ZTS config
+docker run --rm -t \
+    --network="${DOCKER_NETWORK}" \
+    -v "${BASE_DIR}:/athenz" \
+    --user "$(id -u):$(id -g)" \
+    athenz-setup-env \
+    sh /athenz/docker/setup-scripts/zts-auto-config.sh
+# ZTS deploy
+sh "${DOCKER_DIR}/deploy-scripts/zts-deploy.sh"
+# ZTS debug
+docker run --rm -t \
+    --network="${DOCKER_NETWORK}" \
+    -v "${BASE_DIR}:/athenz" \
+    --user "$(id -u):$(id -g)" \
+    athenz-setup-env \
+    sh /athenz/docker/deploy-scripts/zts-debug.sh
 ```
 
 <a id="markdown-useful-commands" name="useful-commands"></a>

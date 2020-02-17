@@ -32,11 +32,22 @@
 <a id="markdown-prerequisites" name="prerequisites"></a>
 ## Prerequisites
 
-1. `openssl`
-1. `keytool`
 1. Env. setup done. ([env.sh](../env.sh))
 1. Bootstrap setup done. ([Done step 1, 2, 3, 4](./Athenz-bootstrap.md#bootstrap-steps))
-1. ZMS setup done. ([zms-setup](./zms-setup.md))
+1. ZMS is running. ([zms-setup](./zms-setup.md))
+1. All the setup commands below are expected to run inside [athenz-setup-env](../setup-scripts/Dockerfile) container.
+```bash
+docker run --rm -it \
+    --network="${DOCKER_NETWORK}" \
+    -v "${BASE_DIR}:/athenz" \
+    --user "$(id -u):$(id -g)" \
+    athenz-setup-env \
+    sh
+
+# load the ENV. inside the container
+BASE_DIR="`git rev-parse --show-toplevel`"
+source "${BASE_DIR}/docker/env.sh"
+```
 
 <a id="markdown-target" name="target"></a>
 ## Target
@@ -279,19 +290,13 @@ curl --silent --request GET \
 
 Download the public keys of ZMS, so that ZTS can verify contents (e.g. policy, token, etc.) signed by ZMS.
 ```bash
-docker run --rm --network="${DOCKER_NETWORK}" \
-    --user "$(id -u):$(id -g)" \
-    -v "${DOMAIN_ADMIN_CERT_KEY_PATH}:/etc/domain-admin/key.pem" \
-    -v "${DOMAIN_ADMIN_CERT_PATH}:/etc/domain-admin/cert.pem" \
-    -v "${ATHENZ_CA_PATH}:/etc/certs/athenz_ca.pem" \
-    -v "${ZTS_CONF_DIR}:/zts/conf" \
-    --name athenz-conf athenz-conf \
-    -svc-key-file /etc/domain-admin/key.pem \
-    -svc-cert-file /etc/domain-admin/cert.pem \
-    -c /etc/certs/athenz_ca.pem \
+athenz-conf \
+    -svc-key-file "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
+    -svc-cert-file "${DOMAIN_ADMIN_CERT_PATH}" \
+    -c "${ATHENZ_CA_PATH}" \
     -z "https://${ZMS_HOST}:${ZMS_PORT}" \
     -t "https://${ZTS_HOST}:${ZTS_PORT}" \
-    -o /zts/conf/athenz.conf
+    -o "${ZTS_CONF_DIR}/athenz.conf"
 
 # less "${ZTS_ATHENZ_CONF}"
 ```
@@ -300,24 +305,23 @@ docker run --rm --network="${DOCKER_NETWORK}" \
 ## Deploy ZTS
 
 ```bash
-sh "${DOCKER_DIR}/deploy-scripts/2.3.deploy-ZTS.sh"
+# run in host machine
+sh "${DOCKER_DIR}/deploy-scripts/zts-deploy.sh"
 ```
 
 <a id="markdown-debug-zts" name="debug-zts"></a>
 ### Debug ZTS
 
 ```bash
-alias llm="less ${DOCKER_DIR}/logs/zms/server.log"
-alias llt="less ${DOCKER_DIR}/logs/zts/server.log"
-alias llmf="less -f ${DOCKER_DIR}/logs/zms/server.log"
-alias lltf="less -f ${DOCKER_DIR}/logs/zts/server.log"
-llt | tail
+BASE_DIR="`git rev-parse --show-toplevel`"
+source "${BASE_DIR}/docker/env.sh"
 
-# add ZTS host
-# grep "${ZTS_HOST}" /etc/hosts && echo '/etc/hosts already set' || sudo sed -i "$ a\127.0.0.1 ${ZTS_HOST}" /etc/hosts
-
-# ZTS health check
-curl --silent --cacert "${ATHENZ_CA_PATH}" "https://${ZTS_HOST}:${ZTS_PORT}/zts/v1/status"; echo '';
+docker run --rm -t \
+    --network="${DOCKER_NETWORK}" \
+    -v "${BASE_DIR}:/athenz" \
+    --user "$(id -u):$(id -g)" \
+    athenz-setup-env \
+    sh /athenz/docker/deploy-scripts/zts-debug.sh
 ```
 
 <a id="markdown-appendix" name="appendix"></a>

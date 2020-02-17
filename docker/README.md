@@ -6,7 +6,7 @@
 
 - [Athenz on Docker](#athenz-on-docker)
     - [Index](#index)
-    - [Prerequisite](#prerequisite)
+    - [Prerequisites](#prerequisites)
     - [Build Athenz](#build-athenz)
     - [Deploy Athenz](#deploy-athenz)
     - [Verify Athenz Deployment](#verify-athenz-deployment)
@@ -22,12 +22,12 @@
 
 <!-- /TOC -->
 
-<a id="markdown-prerequisite" name="prerequisite"></a>
-## Prerequisite
-- `docker`
-- `make`
-- `openssl`
-- `keytool`
+<a id="markdown-prerequisites" name="prerequisites"></a>
+## Prerequisites
+
+1. `git`
+1. `docker`
+1. `make`
 
 <a id="markdown-build-athenz" name="build-athenz"></a>
 ## Build Athenz
