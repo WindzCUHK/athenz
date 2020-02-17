@@ -53,15 +53,15 @@ docker run -d -h "${ZMS_DB_HOST}" \
     -p "${ZMS_DB_PORT}:3306" \
     --network="${DOCKER_NETWORK}" \
     --user mysql:mysql \
-    -v "`pwd`/db/zms/zms-db.cnf:/etc/mysql/conf.d/zms-db.cnf" \
+    -v "${DOCKER_DIR}/db/zms/zms-db.cnf:/etc/mysql/conf.d/zms-db.cnf" \
     -e "MYSQL_ROOT_PASSWORD=${ZMS_DB_ROOT_PASS}" \
     --name "${ZMS_DB_HOST}" athenz-zms-db
 # wait for ZMS DB to be ready
 docker run --rm \
     --network="${DOCKER_NETWORK}" \
     --user mysql:mysql \
-    -v "`pwd`/deploy-scripts/common/wait-for-mysql/wait-for-mysql.sh:/bin/wait-for-mysql.sh" \
-    -v "`pwd`/db/zms/zms-db.cnf:/etc/my.cnf" \
+    -v "${DOCKER_DIR}/deploy-scripts/common/wait-for-mysql/wait-for-mysql.sh:/bin/wait-for-mysql.sh" \
+    -v "${DOCKER_DIR}/db/zms/zms-db.cnf:/etc/my.cnf" \
     -e "MYSQL_PWD=${ZMS_DB_ROOT_PASS}" \
     --entrypoint '/bin/wait-for-mysql.sh' \
     --name wait-for-mysql athenz-zms-db \
@@ -70,7 +70,7 @@ docker run --rm \
     --port=3306
 
 echo '3. add zms_admin to ZMS DB' | colored_cat g
-# remove root user with wildcard host
+# also, remove root user with wildcard host
 docker exec --user mysql:mysql \
     "${ZMS_DB_HOST}" mysql \
     --database=zms_server \
@@ -92,10 +92,10 @@ docker run -d -h "${ZMS_HOST}" \
     -p "${ZMS_PORT}:${ZMS_PORT}" \
     --network="${DOCKER_NETWORK}" \
     --user "$(id -u):$(id -g)" \
-    -v "`pwd`/zms/var:/opt/athenz/zms/var" \
-    -v "`pwd`/zms/conf:/opt/athenz/zms/conf/zms_server" \
-    -v "`pwd`/logs/zms:/opt/athenz/zms/logs/zms_server" \
-    -v "`pwd`/jars:/usr/lib/jars" \
+    -v "${DOCKER_DIR}/zms/var:/opt/athenz/zms/var" \
+    -v "${DOCKER_DIR}/zms/conf:/opt/athenz/zms/conf/zms_server" \
+    -v "${DOCKER_DIR}/logs/zms:/opt/athenz/zms/logs/zms_server" \
+    -v "${DOCKER_DIR}/jars:/usr/lib/jars" \
     -e "JAVA_OPTS=${ZMS_JAVA_OPTS}" \
     -e "ZMS_DB_ADMIN_PASS=${ZMS_DB_ADMIN_PASS}" \
     -e "ZMS_KEYSTORE_PASS=${ZMS_KEYSTORE_PASS}" \
