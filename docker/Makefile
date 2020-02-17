@@ -19,9 +19,16 @@ build:
 	# DOCKER_BUILDKIT=1 docker build -t athenz-cli-util -f ./util/Dockerfile ../
 
 deploy-dev:
-	sh ./setup-scripts/self-signed-certificates.sh
-	sh ./setup-scripts/zms-auto-config.sh
-	sh ./setup-scripts/zts-auto-config.sh
+	# self signed
+	docker run --rm -t -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/setup-scripts/self-signed-certificates.sh
+	# ZMS
+	docker run --rm -t -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/setup-scripts/zms-auto-config.sh
+	sh "./deploy-scripts/zms-deploy.sh"
+	docker run --rm -t --network="$${DOCKER_NETWORK:-athenz}" -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/deploy-scripts/zms-debug.sh
+	# ZTS
+	docker run --rm -t -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/setup-scripts/zts-auto-config.sh
+	sh "./deploy-scripts/zts-deploy.sh"
+	docker run --rm -t --network="$${DOCKER_NETWORK:-athenz}" -v "../:/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env /athenz/docker/deploy-scripts/zts-debug.sh
 
 setup-docker-network:
 	docker network create --subnet $${DOCKER_NETWORK_SUBNET:-172.21.0.0/16} $${DOCKER_NETWORK:-athenz}
