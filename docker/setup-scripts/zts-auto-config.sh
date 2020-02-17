@@ -126,16 +126,11 @@ curl --silent --request GET \
     --url "${ZMS_URL}/zms/v1/domain/sys.auth/service/zts"; echo '';
 
 echo '10. create athenz.conf' | colored_cat g
-docker run --rm --network="${DOCKER_NETWORK}" \
-    --user "$(id -u):$(id -g)" \
-    -v "${DOMAIN_ADMIN_CERT_KEY_PATH}:/etc/domain-admin/key.pem" \
-    -v "${DOMAIN_ADMIN_CERT_PATH}:/etc/domain-admin/cert.pem" \
-    -v "${ATHENZ_CA_PATH}:/etc/certs/athenz_ca.pem" \
-    -v "${ZTS_CONF_DIR}:/zts/conf" \
-    --name athenz-conf athenz-conf \
-    -svc-key-file /etc/domain-admin/key.pem \
-    -svc-cert-file /etc/domain-admin/cert.pem \
-    -c /etc/certs/athenz_ca.pem \
+# run athenz-conf command directly without docker
+athenz-conf \
+    -svc-key-file "${DOMAIN_ADMIN_CERT_KEY_PATH}" \
+    -svc-cert-file "${DOMAIN_ADMIN_CERT_PATH}" \
+    -c "${ATHENZ_CA_PATH}" \
     -z "https://${ZMS_HOST}:${ZMS_PORT}" \
     -t "https://${ZTS_HOST}:${ZTS_PORT}" \
-    -o /zts/conf/athenz.conf
+    -o "${ZTS_CONF_DIR}/athenz.conf"
