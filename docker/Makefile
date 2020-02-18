@@ -33,7 +33,7 @@ deploy-dev:
 	sh "./deploy-scripts/zts-deploy.sh"
 	docker run --rm -t --network="$(DOCKER_NETWORK)" -v "$(BASE_DIR):/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env sh /athenz/docker/deploy-scripts/zts-debug.sh
 
-remove-all: remove-containers remove-networks remove-files
+remove-all: remove-containers remove-networks remove-files reset-repo
 remove-containers:
 	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker stop
 	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker rm
@@ -43,6 +43,9 @@ remove-files:
 	# rm -rf ./jars
 	rm -rf ./logs
 	rm -rf ./zts/var/zts_store
+reset-repo:
+	git reset --hard HEAD
+	git clean -fdx
 
 clean: remove-all
 	docker image rm rdl-athenz-server || true
