@@ -33,9 +33,6 @@ deploy-dev:
 	sh "./deploy-scripts/zts-deploy.sh"
 	docker run --rm -t --network="$(DOCKER_NETWORK)" -v "$(BASE_DIR):/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env sh /athenz/docker/deploy-scripts/zts-debug.sh
 
-setup-docker-network:
-	docker network create --subnet $${DOCKER_NETWORK_SUBNET:-172.21.0.0/16} $(DOCKER_NETWORK)
-
 remove-all: remove-containers remove-networks remove-files
 remove-containers:
 	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker stop
@@ -48,7 +45,6 @@ remove-files:
 	rm -rf ./zts/var/zts_store
 
 clean: remove-all
-	docker image rm wait-for-mysql || true
 	docker image rm rdl-athenz-server || true
 	docker image rm athenz-mvn-base || true
 	docker image rm athenz-builder || true
@@ -58,5 +54,4 @@ clean: remove-all
 	docker image rm athenz-zms-db || true
 	docker image rm athenz-zts-db || true
 	docker image rm athenz-conf || true
-	# docker image rm athenz-zms-cli || true
-	# docker image rm athenz-cli-util || true
+	docker image rm athenz-setup-env || true
