@@ -9,7 +9,7 @@ BASE_DIR=$(shell git rev-parse --show-toplevel)
 
 BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 VCS_REF=$(shell git rev-parse --short HEAD)
-BUILD_ARG := --build-arg \'BUILD_DATE=$(BUILD_DATE)\' --build-arg \'VCS_REF=$(VCS_REF)\'
+BUILD_ARG := --build-arg 'BUILD_DATE=$(BUILD_DATE)' --build-arg 'VCS_REF=$(VCS_REF)'
 
 build:
 	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) -t rdl-athenz-server -f ./util/rdl-athenz-server/Dockerfile ../rdl/rdl-gen-athenz-server
