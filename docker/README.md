@@ -50,7 +50,12 @@ make build
 <a id="markdown-verify-athenz-deployment" name="verify-athenz-deployment"></a>
 ## Verify Athenz Deployment
 
-- [acceptance-test](./docs/acceptance-test.md)
+- production environment
+    - [acceptance-test](./docs/acceptance-test.md)
+- development environment
+    ```bash
+    make verify
+    ```
 
 <a id="markdown-java-remote-debugging" name="java-remote-debugging"></a>
 ### JAVA Remote debugging

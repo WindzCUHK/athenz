@@ -82,6 +82,7 @@ In Athenz, we often have 3 types of CA:
     ```
 1. Set up ZMS ([zms-setup](./zms-setup.md))
 1. Set up ZTS ([zts-setup](./zts-setup.md))
+1. Simple verification of the deployment (`make verify`)
 1. Verify your setup ([acceptance-test](./acceptance-test.md))
 
 <a id="markdown-appendix" name="appendix"></a>
