@@ -87,7 +87,17 @@ docker run --rm \
 ## Cleanup
 
 ```bash
-# remove deployment
+# remove Athenz containers
+make remove-containers
+
+# remove server data
+make remove-files
+
+# remove bootstrap setup files
+make reset-repo
+```
+```bash
+# ENV reset
 make remove-all
 
 # remove everything include docker images

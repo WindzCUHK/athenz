@@ -11,7 +11,6 @@
         - [Athenz Demo Playback](#athenz-demo-playback)
         - [points to note](#points-to-note)
         - [automation shortcut](#automation-shortcut)
-        - [useful commands](#useful-commands)
         - [TODO](#todo)
 
 <!-- /TOC -->
@@ -147,14 +146,6 @@ docker run --rm -t \
     --user "$(id -u):$(id -g)" \
     athenz-setup-env \
     sh /athenz/docker/deploy-scripts/zts-debug.sh
-```
-
-<a id="markdown-useful-commands" name="useful-commands"></a>
-### useful commands
-
-```bash
-# reset repo
-git reset --hard HEAD; git clean -fdx
 ```
 
 <a id="markdown-todo" name="todo"></a>

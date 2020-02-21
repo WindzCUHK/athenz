@@ -37,22 +37,20 @@ deploy-dev:
 	docker run --rm -t --network="$(DOCKER_NETWORK)" -v "$(BASE_DIR):/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env sh /athenz/docker/deploy-scripts/zts-debug.sh
 
 UNAME := $(shell uname -s)
+XARGS_OPT :=
+ifeq ($(UNAME_S),Linux)
+	XARGS_OPT += --no-run-if-empty
+else
+	# assume Mac, ifeq ($(UNAME_S),Darwin)
+endif
 
 remove-all: remove-containers remove-networks remove-files reset-repo
 remove-containers:
-	ifeq ($(UNAME_S),Darwin)
-		@echo OSX
-	else
-		# ifeq ($(UNAME_S),Linux)
-		@echo LINUX
-	endif
-	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker stop
-	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker rm
-	# org.label-schema.url="https://www.athenz.io/"
+	docker ps -aq --filter 'label=org.label-schema.url=https://www.athenz.io/' | xargs $(XARGS_OPT) docker stop
+	docker ps -aq --filter 'label=org.label-schema.url=https://www.athenz.io/' | xargs $(XARGS_OPT) docker rm
 remove-networks:
 	docker network rm $(DOCKER_NETWORK) || true
 remove-files:
-	# rm -rf ./jars
 	rm -rf ./logs
 	rm -rf ./zts/var/zts_store
 reset-repo:
