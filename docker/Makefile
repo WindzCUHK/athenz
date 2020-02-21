@@ -36,18 +36,10 @@ deploy-dev:
 	sh "./deploy-scripts/zts-deploy.sh"
 	docker run --rm -t --network="$(DOCKER_NETWORK)" -v "$(BASE_DIR):/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env sh /athenz/docker/deploy-scripts/zts-debug.sh
 
-UNAME := $(shell uname -s)
-XARGS_OPT :=
-ifeq ($(UNAME_S),Linux)
-	XARGS_OPT += --no-run-if-empty
-else
-	# assume Mac, ifeq ($(UNAME_S),Darwin)
-endif
-
 remove-all: remove-containers remove-networks remove-files reset-repo
 remove-containers:
-	docker ps -aq --filter 'label=org.label-schema.url=https://www.athenz.io/' | xargs $(XARGS_OPT) docker stop
-	docker ps -aq --filter 'label=org.label-schema.url=https://www.athenz.io/' | xargs $(XARGS_OPT) docker rm
+	docker stop $(shell docker ps -aq --filter 'label=org.label-schema.url=https://www.athenz.io/')
+	docker rm $(shell docker ps -aq --filter 'label=org.label-schema.url=https://www.athenz.io/')
 remove-networks:
 	docker network rm $(DOCKER_NETWORK) || true
 remove-files:
