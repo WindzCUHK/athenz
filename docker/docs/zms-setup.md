@@ -60,7 +60,7 @@ export ZMS_TRUSTSTORE_PASS=<your_password>
 <a id="markdown-2-get-a-server-certificate-for-zms" name="2-get-a-server-certificate-for-zms"></a>
 ### 2. get a server certificate for ZMS
 
-- Create your CSR and private key for ZMS (TODO: provide template .cnf file)
+- Create your CSR and private key for ZMS
 - Ask your **Athenz CA** to sign the CSR and get the server certificate for ZMS
 ```bash
 # copy your file in the following paths

@@ -3,22 +3,25 @@ GID=$(DOCKER_GID)
 UID=$(DOCKER_UID)
 GID_ARG := $(if $(GID),--build-arg GID=$(GID),--build-arg GID)
 UID_ARG := $(if $(UID),--build-arg UID=$(UID),--build-arg UID)
-# docker network name
+
 DOCKER_NETWORK := $(if $(DOCKER_NETWORK),$(DOCKER_NETWORK),athenz)
 BASE_DIR=$(shell git rev-parse --show-toplevel)
 
+BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+VCS_REF=$(shell git rev-parse --short HEAD)
+BUILD_ARG := --build-arg \'BUILD_DATE=$(BUILD_DATE)\' --build-arg \'VCS_REF=$(VCS_REF)\'
+
 build:
-	DOCKER_BUILDKIT=1 docker build -t rdl-athenz-server -f ./util/rdl-athenz-server/Dockerfile ../rdl/rdl-gen-athenz-server
-	DOCKER_BUILDKIT=1 docker build -t athenz-mvn-base -f ./util/athenz-mvn-base/Dockerfile ../
-	DOCKER_BUILDKIT=1 docker build -t athenz-builder -f ./util/athenz-builder/Dockerfile ../
-	DOCKER_BUILDKIT=1 docker build $(GID_ARG) $(UID_ARG) -t athenz-zms-server -f ./zms/Dockerfile ../
-	DOCKER_BUILDKIT=1 docker build $(GID_ARG) $(UID_ARG) -t athenz-zts-server -f ./zts/Dockerfile ../
-	DOCKER_BUILDKIT=1 docker build $(GID_ARG) $(UID_ARG) -t athenz-ui -f ./ui/Dockerfile ../ui
-	DOCKER_BUILDKIT=1 docker build -t athenz-zms-db -f ./db/zms/Dockerfile ../servers/zms/schema
-	DOCKER_BUILDKIT=1 docker build -t athenz-zts-db -f ./db/zts/Dockerfile ../servers/zts/schema
-	DOCKER_BUILDKIT=1 docker build -t athenz-conf -f ./util/athenz-conf/Dockerfile ../
-	DOCKER_BUILDKIT=1 docker build -t athenz-setup-env -f ./setup-scripts/Dockerfile ../
-	# DOCKER_BUILDKIT=1 docker build -t athenz-zms-cli -f ./util/zms-cli/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) -t rdl-athenz-server -f ./util/rdl-athenz-server/Dockerfile ../rdl/rdl-gen-athenz-server
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) -t athenz-mvn-base -f ./util/athenz-mvn-base/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) -t athenz-builder -f ./util/athenz-builder/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) $(GID_ARG) $(UID_ARG) -t athenz-zms-server -f ./zms/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) $(GID_ARG) $(UID_ARG) -t athenz-zts-server -f ./zts/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) $(GID_ARG) $(UID_ARG) -t athenz-ui -f ./ui/Dockerfile ../ui
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) -t athenz-zms-db -f ./db/zms/Dockerfile ../servers/zms/schema
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) -t athenz-zts-db -f ./db/zts/Dockerfile ../servers/zts/schema
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) -t athenz-conf -f ./util/athenz-conf/Dockerfile ../
+	DOCKER_BUILDKIT=1 docker build $(BUILD_ARG) -t athenz-setup-env -f ./setup-scripts/Dockerfile ../
 	# DOCKER_BUILDKIT=1 docker build -t athenz-cli-util -f ./util/Dockerfile ../
 
 deploy-dev:
@@ -33,10 +36,19 @@ deploy-dev:
 	sh "./deploy-scripts/zts-deploy.sh"
 	docker run --rm -t --network="$(DOCKER_NETWORK)" -v "$(BASE_DIR):/athenz" --user "$(shell id -u):$(shell id -g)" athenz-setup-env sh /athenz/docker/deploy-scripts/zts-debug.sh
 
+UNAME := $(shell uname -s)
+
 remove-all: remove-containers remove-networks remove-files reset-repo
 remove-containers:
+	ifeq ($(UNAME_S),Darwin)
+		@echo OSX
+	else
+		# ifeq ($(UNAME_S),Linux)
+		@echo LINUX
+	endif
 	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker stop
 	docker ps -a | grep athenz- | awk '{print $$1}' | xargs --no-run-if-empty docker rm
+	# org.label-schema.url="https://www.athenz.io/"
 remove-networks:
 	docker network rm $(DOCKER_NETWORK) || true
 remove-files:

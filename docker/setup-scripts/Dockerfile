@@ -1,6 +1,20 @@
 FROM athenz-conf AS athenz-conf
 
 FROM adoptopenjdk/openjdk8:alpine-jre
+# date -u +'%Y-%m-%dT%H:%M:%SZ'
+ARG BUILD_DATE
+# git rev-parse --short HEAD
+ARG VCS_REF
+
+LABEL org.label-schema.schema-version="1.0"
+LABEL org.label-schema.build-date=$BUILD_DATE
+LABEL org.label-schema.name="athenz-setup-env"
+LABEL org.label-schema.description="Athenz bootstrap setup ENV"
+LABEL org.label-schema.url="https://www.athenz.io/"
+LABEL org.label-schema.vcs-url="https://github.com/yahoo/athenz"
+LABEL org.label-schema.vcs-ref=$VCS_REF
+LABEL maintainer "YJ Athenz Team <athenz-pj@ml.yahoo-corp.jp>"
+
 
 COPY --from=athenz-conf /usr/bin/athenz-conf /usr/bin/athenz-conf
 

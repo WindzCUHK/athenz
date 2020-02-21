@@ -82,7 +82,7 @@ export ZMS_CLIENT_TRUSTSTORE_PASS=<your_password>
 <a id="markdown-2-get-a-server-certificate-for-zts" name="2-get-a-server-certificate-for-zts"></a>
 ### 2. get a server certificate for ZTS
 
-- Create your CSR and private key for ZTS (TODO: provide template .cnf file)
+- Create your CSR and private key for ZTS
 - Ask your **Athenz CA** to sign the CSR and get the server certificate for ZTS
 ```bash
 # copy your file in the following paths
@@ -151,7 +151,7 @@ For production environment, we suggest to use the [HttpCertSigner.java](https://
 However, to simplify the setup, we will create an intermediate CA signed by the **Service CA** (1), and then use that intermediate CA to sign the service certificates issued by Athenz (2).
 
 1. Create an intermediate CA certificate
-    - Create your CSR and private key for the intermediate CA (TODO: provide template .cnf file)
+    - Create your CSR and private key for the intermediate CA
     - Ask your **Service CA** to sign the CSR and get the intermediate CA certificate
     ```bash
     # copy your file in the following paths
@@ -179,7 +179,7 @@ However, to simplify the setup, we will create an intermediate CA signed by the 
 ### 7. set up for ZMS connection
 
 1. Create ZTS client certificate
-    - Create your CSR and private key for the ZTS client certificate (TODO: provide template .cnf file)
+    - Create your CSR and private key for the ZTS client certificate
     - Ask your **Service CA** to sign the CSR and get the ZTS client certificate
     ```bash
     # copy your file in the following paths
