@@ -48,6 +48,11 @@
       <artifactId>jjwt</artifactId>
       <version>${jjwt.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.auth0</groupId>
+      <artifactId>jwks-rsa</artifactId>
+      <version>${jwks.rsa.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
