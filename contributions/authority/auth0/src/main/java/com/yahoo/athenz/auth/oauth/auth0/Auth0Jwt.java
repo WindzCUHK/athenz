@@ -19,44 +19,89 @@ import java.util.LinkedHashMap;
 import com.yahoo.athenz.auth.AuthorityConsts;
 import com.yahoo.athenz.auth.oauth.token.DefaultOAuthJwtAccessToken;
 import com.yahoo.athenz.auth.oauth.token.OAuthJwtAccessToken;
+import com.yahoo.athenz.auth.util.AthenzUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.RequiredTypeException;
 
 /**
  * Custom for Auth0 JWT access token format
  */
 public class Auth0Jwt extends DefaultOAuthJwtAccessToken {
 
-	public static final String CLAIM_CLIENT_ID = "https://myapp.example.com/client_id";
-	public static final String CLAIM_CONFIRM = "https://myapp.example.com/cnf";
+    private static String claimClientId = "https://myapp.example.com/client_id";
+    private static String claimConfirm = "https://myapp.example.com/cnf";
+    private static String userDomain = "user";
 
-	private static final String USER_DOMAIN = "user";
-	final String userDomain;
+    /**
+     * Create Auth0 JWT access token object
+     * @param  jws JWS claims
+     */
+    public Auth0Jwt(Jws<Claims> jws) {
+        super(jws);
+    }
 
-	/**
-	 * Create Auth0 JWT access token object
-	 * @param  jws JWS claims
-	 */
-	public Auth0Jwt(Jws<Claims> jws) {
-		super(jws);
-		this.userDomain = System.getProperty(AuthorityConsts.ATHENZ_PROP_USER_DOMAIN, USER_DOMAIN);
-	}
+    @Override
+    public String getSubject() {
+        String subject = this.body.getSubject();
+        if (subject == null) {
+            return null;
+        }
+        // normalize as Athenz principal
+        return (AthenzUtils.getPrincipalName(Auth0Jwt.userDomain, subject.replace('|', '-'))).toLowerCase();
+    }
 
-	@Override
-	public String getSubject() {
-		// normalize as Athenz principal
-		return (this.userDomain + AuthorityConsts.ATHENZ_PRINCIPAL_DELIMITER_CHAR + this.body.getSubject().replace('|', '-')).toLowerCase();
-	}
+    @Override
+    public String getClientId() {
+        return this.body.get(Auth0Jwt.claimClientId, String.class);
+    }
 
-	@Override
-	public String getClientId() {
-		return this.body.get(Auth0Jwt.CLAIM_CLIENT_ID, String.class);
-	}
+    @Override
+    public String getCertificateThumbprint() {
+        LinkedHashMap<?, ?> certConf = null;
+        try {
+            certConf = this.body.get(Auth0Jwt.claimConfirm, LinkedHashMap.class);
+            if (certConf == null) {
+                return null;
+            }
+        } catch (RequiredTypeException e) {
+            return null;
+        }
+        return (String) certConf.get(OAuthJwtAccessToken.CLAIM_CONFIRM_X509_HASH);
+    }
 
-	@Override
-	public String getCertificateThumbprint() {
-		LinkedHashMap<?, ?> certConf = this.body.get(Auth0Jwt.CLAIM_CONFIRM, LinkedHashMap.class);
-		return (String) certConf.get(OAuthJwtAccessToken.CLAIM_CONFIRM_X509_HASH);
-	}
+    /**
+     * set the client ID claim
+     * @param claimClientId client ID claim
+     */
+    public static void setClaimClientId(String claimClientId) {
+        Auth0Jwt.claimClientId = claimClientId;
+    }
+
+    /**
+     * set the confirm claim
+     * @param claimConfirm confirm claim
+     */
+    public static void setClaimConfirm(String claimConfirm) {
+        Auth0Jwt.claimConfirm = claimConfirm;
+    }
+
+    /**
+     * set the user domain (user principal format: <user_domain>.<auth0_jwt_subject>)
+     * @param userDomain Athenz user domain
+     */
+    public static void setUserDomain(String userDomain) {
+        Auth0Jwt.userDomain = userDomain;
+    }
+
+    public static String getClaimClientId() {
+        return Auth0Jwt.claimClientId;
+    }
+    public static String getClaimConfirm() {
+        return Auth0Jwt.claimConfirm;
+    }
+    public static String getUserDomain() {
+        return Auth0Jwt.userDomain;
+    }
 
 }

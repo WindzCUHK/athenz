@@ -23,8 +23,8 @@ import com.yahoo.athenz.auth.KeyStore;
  */
 public class DefaultOAuthJwtAccessTokenParserFactory implements OAuthJwtAccessTokenParserFactory {
 
-    public static final String JWKS_URL = "jwks_url";
     public static final String SYSTEM_PROP_PREFIX = "athenz.auth.oauth.jwt.parser.";
+    public static final String JWKS_URL = "jwks_url";
     public static final BiFunction<String, String, String> GET_PROPERTY = (String key, String def) -> {
         return System.getProperty(SYSTEM_PROP_PREFIX + key, def);
     };

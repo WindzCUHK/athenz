@@ -86,9 +86,13 @@ public class DefaultOAuthJwtAccessToken implements OAuthJwtAccessToken {
     @Override
     public String getCertificateThumbprint() {
         // https://github.com/jwtk/jjwt/issues/404, custom model class not supported
-        LinkedHashMap<?, ?> certConf =
-                this.body.get(OAuthJwtAccessToken.CLAIM_CONFIRM, LinkedHashMap.class);
-        if (certConf == null) {
+        LinkedHashMap<?, ?> certConf = null;
+        try {
+            certConf = this.body.get(OAuthJwtAccessToken.CLAIM_CONFIRM, LinkedHashMap.class);
+            if (certConf == null) {
+                return null;
+            }
+        } catch (RequiredTypeException e) {
             return null;
         }
         return (String) certConf.get(OAuthJwtAccessToken.CLAIM_CONFIRM_X509_HASH);

@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 // import com.yahoo.athenz.auth.oauth.parser.OAuthJwtAccessTokenParser;
 // import com.yahoo.athenz.auth.oauth.parser.OAuthJwtAccessTokenParserFactory;
 
-public class Auth0JwtParserTest {
+public class Auth0JwtParserFactoryTest {
 
     @Test
     public void testAuth0JwtParserFactory() {

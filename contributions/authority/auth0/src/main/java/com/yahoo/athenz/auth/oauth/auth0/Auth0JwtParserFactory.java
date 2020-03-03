@@ -1,18 +1,21 @@
 /*
  * Copyright 2020 Yahoo Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.yahoo.athenz.auth.oauth.auth0;
 
+import com.yahoo.athenz.auth.AuthorityConsts;
 import com.yahoo.athenz.auth.KeyStore;
 import com.yahoo.athenz.auth.oauth.parser.DefaultOAuthJwtAccessTokenParserFactory;
 import com.yahoo.athenz.auth.oauth.parser.OAuthJwtAccessTokenParser;
@@ -22,11 +25,17 @@ import com.yahoo.athenz.auth.oauth.parser.OAuthJwtAccessTokenParser;
  */
 public class Auth0JwtParserFactory extends DefaultOAuthJwtAccessTokenParserFactory {
 
-	@Override
-	public OAuthJwtAccessTokenParser create(KeyStore keyStore) throws IllegalArgumentException {
-		String jwksUrl = getProperty.apply(JWKS_URL, "https://athenz.io/jwks.json");
+    public static final String CLAIM_CLIENT_ID = "auth0.claim_client_id";
+    public static final String CLAIM_CONFIRM = "auth0.claim_confirm";
 
-		return new Auth0JwtParser(keyStore, jwksUrl);
-	}
+    @Override
+    public OAuthJwtAccessTokenParser create(KeyStore keyStore) throws IllegalArgumentException {
+        Auth0Jwt.setClaimClientId(GET_PROPERTY.apply(CLAIM_CLIENT_ID, Auth0Jwt.getClaimClientId()));
+        Auth0Jwt.setClaimConfirm(GET_PROPERTY.apply(CLAIM_CONFIRM, Auth0Jwt.getClaimConfirm()));
+        Auth0Jwt.setUserDomain(GET_PROPERTY.apply(AuthorityConsts.ATHENZ_PROP_USER_DOMAIN, Auth0Jwt.getUserDomain()));
+
+        String jwksUrl = GET_PROPERTY.apply(JWKS_URL, "https://athenz.io/jwks.json");
+        return new Auth0JwtParser(keyStore, jwksUrl);
+    }
 
 }
