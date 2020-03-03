@@ -29,93 +29,93 @@ import io.jsonwebtoken.RequiredTypeException;
  */
 public class DefaultOAuthJwtAccessToken implements OAuthJwtAccessToken {
 
-	// protected JwsHeader<?> header;
-	protected Claims body;
-	protected String signature;
+    // protected JwsHeader<?> header;
+    protected Claims body;
+    protected String signature;
 
-	/**
-	 * Create DefaultOAuthJwtAccessToken access token object
-	 * @param  jws JWS claims
-	 */
-	public DefaultOAuthJwtAccessToken(Jws<Claims> jws) {
-		// this.header = jws.getHeader();
-		this.body = jws.getBody();
-		this.signature = jws.getSignature();
-	}
+    /**
+     * Create DefaultOAuthJwtAccessToken access token object
+     * @param  jws JWS claims
+     */
+    public DefaultOAuthJwtAccessToken(Jws<Claims> jws) {
+        // this.header = jws.getHeader();
+        this.body = jws.getBody();
+        this.signature = jws.getSignature();
+    }
 
-	@Override
-	public String getSubject() {
-		String subject = this.body.getSubject();
-		if (subject == null) {
-			return null;
-		}
-		return subject.toLowerCase(); // normalize as Athenz principal
-	}
+    @Override
+    public String getSubject() {
+        String subject = this.body.getSubject();
+        if (subject == null) {
+            return null;
+        }
+        return subject.toLowerCase(); // normalize as Athenz principal
+    }
 
-	@Override
-	public String getIssuer() {
-		return this.body.getIssuer();
-	}
+    @Override
+    public String getIssuer() {
+        return this.body.getIssuer();
+    }
 
-	@Override
-	public String getAudience() {
-		// aud can be string or an array of strings.
-		return this.body.getAudience();
-	}
+    @Override
+    public String getAudience() {
+        // aud can be string or an array of strings.
+        return this.body.getAudience();
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<String> getAudiences() {
-		// https://tools.ietf.org/html/rfc7519#page-9
-		List<String> audiences;
-		try {
-			// returns null if not found
-			audiences = this.body.get(Claims.AUDIENCE, ArrayList.class);
-		} catch (RequiredTypeException e) {
-			// found but class mismatch
-			audiences = Arrays.asList(new String[]{ this.body.getAudience() });
-		}
-		return audiences;
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> getAudiences() {
+        // https://tools.ietf.org/html/rfc7519#page-9
+        List<String> audiences;
+        try {
+            // returns null if not found
+            audiences = this.body.get(Claims.AUDIENCE, ArrayList.class);
+        } catch (RequiredTypeException e) {
+            // found but class mismatch
+            audiences = Arrays.asList(new String[]{ this.body.getAudience() });
+        }
+        return audiences;
+    }
 
-	@Override
-	public String getClientId() {
-		return this.body.get(OAuthJwtAccessToken.CLAIM_CLIENT_ID, String.class);
-	}
+    @Override
+    public String getClientId() {
+        return this.body.get(OAuthJwtAccessToken.CLAIM_CLIENT_ID, String.class);
+    }
 
-	@Override
-	public String getCertificateThumbprint() {
-		// https://github.com/jwtk/jjwt/issues/404, custom model class not supported
-		LinkedHashMap<?, ?> certConf =
-				this.body.get(OAuthJwtAccessToken.CLAIM_CONFIRM, LinkedHashMap.class);
-		if (certConf == null) {
-			return null;
-		}
-		return (String) certConf.get(OAuthJwtAccessToken.CLAIM_CONFIRM_X509_HASH);
-	}
+    @Override
+    public String getCertificateThumbprint() {
+        // https://github.com/jwtk/jjwt/issues/404, custom model class not supported
+        LinkedHashMap<?, ?> certConf =
+                this.body.get(OAuthJwtAccessToken.CLAIM_CONFIRM, LinkedHashMap.class);
+        if (certConf == null) {
+            return null;
+        }
+        return (String) certConf.get(OAuthJwtAccessToken.CLAIM_CONFIRM_X509_HASH);
+    }
 
-	@Override
-	public String getScope() {
-		return this.body.get(OAuthJwtAccessToken.CLAIM_SCOPE, String.class);
-	}
+    @Override
+    public String getScope() {
+        return this.body.get(OAuthJwtAccessToken.CLAIM_SCOPE, String.class);
+    }
 
-	@Override
-	public long getIssuedAt() {
-		Date date = this.body.getIssuedAt();
-		if (date == null) {
-			return 0L;
-		}
-		return this.body.getIssuedAt().getTime() / 1000; // second
-	}
+    @Override
+    public long getIssuedAt() {
+        Date date = this.body.getIssuedAt();
+        if (date == null) {
+            return 0L;
+        }
+        return this.body.getIssuedAt().getTime() / 1000; // second
+    }
 
-	@Override
-	public String getSignature() {
-		return this.signature;
-	}
+    @Override
+    public String getSignature() {
+        return this.signature;
+    }
 
-	@Override
-	public String toString() {
-		return this.body.toString();
-	}
+    @Override
+    public String toString() {
+        return this.body.toString();
+    }
 
 }

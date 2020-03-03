@@ -20,18 +20,18 @@ package com.yahoo.athenz.auth.oauth.token;
  */
 public class OAuthJwtAccessTokenException extends Exception {
 
-	private static final long serialVersionUID = -3287975953851497109L;
+    private static final long serialVersionUID = -3287975953851497109L;
 
-	public OAuthJwtAccessTokenException() {
-		super();
-	}
+    public OAuthJwtAccessTokenException() {
+        super();
+    }
 
-	public OAuthJwtAccessTokenException(String message) {
-		super(message);
-	}
+    public OAuthJwtAccessTokenException(String message) {
+        super(message);
+    }
 
-	public OAuthJwtAccessTokenException(Throwable cause) {
-		super(cause);
-	}
+    public OAuthJwtAccessTokenException(Throwable cause) {
+        super(cause);
+    }
 
 }

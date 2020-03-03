@@ -24,6 +24,7 @@ public interface OAuthJwtAccessTokenParserFactory {
 
     /**
      * Create an OAuthJwtAccessTokenParser instance
+     * @param keyStore keyStore
      * @return OAuthJwtAccessTokenParser instance
      */
     public OAuthJwtAccessTokenParser create(KeyStore keyStore) throws IllegalArgumentException;

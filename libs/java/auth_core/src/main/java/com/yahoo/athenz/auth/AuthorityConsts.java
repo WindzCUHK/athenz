@@ -20,14 +20,17 @@ package com.yahoo.athenz.auth;
  */
 public final class AuthorityConsts {
 
-	// Athenz data model
-	public static final char ATHENZ_PRINCIPAL_DELIMITER_CHAR = '.';
-	public static final String ATHENZ_PRINCIPAL_DELIMITER = String.valueOf(ATHENZ_PRINCIPAL_DELIMITER_CHAR);
+    // Athenz data model
+    public static final char ATHENZ_PRINCIPAL_DELIMITER_CHAR = '.';
+    public static final String ATHENZ_PRINCIPAL_DELIMITER = String.valueOf(ATHENZ_PRINCIPAL_DELIMITER_CHAR);
+    public static final String ROLE_SEP = ":role.";
 
-	// system properties
-	public static final String ATHENZ_PROP_USER_DOMAIN = "athenz.user_domain";
+    // system properties
+    public static final String ATHENZ_PROP_USER_DOMAIN = "athenz.user_domain";
 
-	// prevent object creation
-	private AuthorityConsts() {}
+    // prevent object creation
+    private AuthorityConsts() {
+        
+    }
 
 }

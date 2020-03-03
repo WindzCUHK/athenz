@@ -27,57 +27,59 @@ import com.yahoo.athenz.auth.oauth.JwtAuthorityConsts;
  */
 public class JwtAuthorityUtils {
 
-	/**
-	 * get system properties with JwtAuthority prefix
-	 * @param  key property name
-	 * @param  def default value
-	 * @return     system property value set
-	 */
-	public static final String getProperty(String key, String def) {
-		return System.getProperty(JwtAuthorityConsts.SYSTEM_PROP_PREFIX + key, def);
-	}
+    /**
+     * get system properties with JwtAuthority prefix
+     * @param  key property name
+     * @param  def default value
+     * @return     system property value set
+     */
+    public static final String getProperty(String key, String def) {
+        return System.getProperty(JwtAuthorityConsts.SYSTEM_PROP_PREFIX + key, def);
+    }
 
-	/**
-	 * convert CSV string to Set
-	 * @param  csv       CSV string
-	 * @param  delimiter CSV delimiter
-	 * @return           corresponding Set object of the CSV string, or null if CSV is null or empty
-	 */
-	public static final Set<String> csvToSet(String csv, String delimiter) {
-		if (csv == null || csv.isEmpty()) {
-			return null;
-		}
-		if (delimiter == null || delimiter.isEmpty()) {
-			return new HashSet<>(Arrays.asList(csv));
-		}
-		return new HashSet<>(Arrays.asList(csv.split(delimiter)));
-	}
+    /**
+     * convert CSV string to Set
+     * @param  csv       CSV string
+     * @param  delimiter CSV delimiter
+     * @return           corresponding Set object of the CSV string, or null if CSV is null or empty
+     */
+    public static final Set<String> csvToSet(String csv, String delimiter) {
+        if (csv == null || csv.isEmpty()) {
+            return null;
+        }
+        if (delimiter == null || delimiter.isEmpty()) {
+            return new HashSet<>(Arrays.asList(csv));
+        }
+        return new HashSet<>(Arrays.asList(csv.split(delimiter)));
+    }
 
-	/**
-	 * Extract the OAuth bearer token from a header.
-	 * from: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/authentication/BearerTokenExtractor.java
-	 * @param request the request
-	 * @return        the token, or null if no OAuth authorization header was supplied
-	 */
-	public static final String extractHeaderToken(HttpServletRequest request) {
-		Enumeration<String> headers = request.getHeaders(JwtAuthorityConsts.AUTH_HEADER);
-		while (headers.hasMoreElements()) {
-			// typically there is only one (most servers enforce that)
-			String value = headers.nextElement();
-			if ((value.toLowerCase().startsWith(JwtAuthorityConsts.BEARER_TYPE))) {
-				String authHeaderValue = value.substring(JwtAuthorityConsts.BEARER_TYPE.length()).trim();
-				int commaIndex = authHeaderValue.indexOf(',');
-				if (commaIndex > 0) {
-					authHeaderValue = authHeaderValue.substring(0, commaIndex);
-				}
-				return authHeaderValue;
-			}
-		}
+    /**
+     * Extract the OAuth bearer token from a header.
+     * from: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/authentication/BearerTokenExtractor.java
+     * @param request the request
+     * @return        the token, or null if no OAuth authorization header was supplied
+     */
+    public static final String extractHeaderToken(HttpServletRequest request) {
+        Enumeration<String> headers = request.getHeaders(JwtAuthorityConsts.AUTH_HEADER);
+        while (headers.hasMoreElements()) {
+            // typically there is only one (most servers enforce that)
+            String value = headers.nextElement();
+            if ((value.toLowerCase().startsWith(JwtAuthorityConsts.BEARER_TYPE))) {
+                String authHeaderValue = value.substring(JwtAuthorityConsts.BEARER_TYPE.length()).trim();
+                int commaIndex = authHeaderValue.indexOf(',');
+                if (commaIndex > 0) {
+                    authHeaderValue = authHeaderValue.substring(0, commaIndex);
+                }
+                return authHeaderValue;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	// prevent object creation
-	private JwtAuthorityUtils() {}
+    // prevent object creation
+    private JwtAuthorityUtils() {
+        
+    }
 
 }

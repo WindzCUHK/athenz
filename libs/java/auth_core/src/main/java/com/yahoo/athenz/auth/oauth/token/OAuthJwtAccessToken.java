@@ -19,81 +19,81 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * OAuth2 JWT access token object interface<br>
- * @see https://tools.ietf.org/html/rfc7519
- * @see https://tools.ietf.org/html/draft-ietf-oauth-access-token-jwt-03
- * @see https://tools.ietf.org/html/draft-ietf-oauth-token-exchange-19
- * @see https://tools.ietf.org/html/draft-ietf-oauth-mtls-17
+ * OAuth2 JWT access token object interface
+ * @see <a href="https://tools.ietf.org/html/rfc7519" target="_top">RFC7519</a>
+ * @see <a href="https://tools.ietf.org/html/draft-ietf-oauth-access-token-jwt-03" target="_top">draft-ietf-oauth-access-token-jwt-03</a>
+ * @see <a href="https://tools.ietf.org/html/draft-ietf-oauth-token-exchange-19" target="_top">draft-ietf-oauth-token-exchange-19</a>
+ * @see <a href="https://tools.ietf.org/html/draft-ietf-oauth-mtls-17" target="_top">draft-ietf-oauth-mtls-17</a>
  */
 public interface OAuthJwtAccessToken {
 
-	// claims
-	public static final String CLAIM_CONFIRM = "cnf";
-	public static final String CLAIM_CONFIRM_X509_HASH = "x5t#S256";
-	public static final String CLAIM_SCOPE = "scope";
-	public static final String CLAIM_CLIENT_ID = "client_id";
+    // claims
+    public static final String CLAIM_CONFIRM = "cnf";
+    public static final String CLAIM_CONFIRM_X509_HASH = "x5t#S256";
+    public static final String CLAIM_SCOPE = "scope";
+    public static final String CLAIM_CLIENT_ID = "client_id";
 
-	// delimiters
-	public static final String SCOPE_DELIMITER = " ";
+    // delimiters
+    public static final String SCOPE_DELIMITER = " ";
 
-	/**
-	 * @return JWT subject (sub)
-	 */
-	public String getSubject();
+    /**
+     * @return JWT subject (sub)
+     */
+    public String getSubject();
 
-	/**
-	 * @return JWT issuer (iss)
-	 */
-	public String getIssuer();
+    /**
+     * @return JWT issuer (iss)
+     */
+    public String getIssuer();
 
-	/**
-	 * @return JWT audience (aud)
-	 */
-	public String getAudience();
+    /**
+     * @return JWT audience (aud)
+     */
+    public String getAudience();
 
-	/**
-	 * @return JWT audiences (aud) as list
-	 */
-	public List<String> getAudiences();
+    /**
+     * @return JWT audiences (aud) as list
+     */
+    public List<String> getAudiences();
 
-	/**
-	 * @return JWT client ID (client_id)
-	 */
-	public String getClientId();
+    /**
+     * @return JWT client ID (client_id)
+     */
+    public String getClientId();
 
-	/**
-	 * @return JWT certificate thumbprint (cnf['x5t#S256'])
-	 */
-	public String getCertificateThumbprint();
+    /**
+     * @return JWT certificate thumbprint (cnf['x5t#S256'])
+     */
+    public String getCertificateThumbprint();
 
-	/**
-	 * @return JWT scope (scope)
-	 */
-	public String getScope();
+    /**
+     * @return JWT scope (scope)
+     */
+    public String getScope();
 
-	/**
-	 * @return JWT scopes (scope) as List
-	 */
-	public default List<String> getScopes() {
-		if (this.getScope() == null) {
-			return null;
-		}
-		return Arrays.asList(this.getScope().split(SCOPE_DELIMITER));
-	}
+    /**
+     * @return JWT scopes (scope) as List
+     */
+    public default List<String> getScopes() {
+        if (this.getScope() == null) {
+            return null;
+        }
+        return Arrays.asList(this.getScope().split(SCOPE_DELIMITER));
+    }
 
-	/**
-	 * @return JWT issued at (iat)
-	 */
-	public long getIssuedAt();
+    /**
+     * @return JWT issued at (iat)
+     */
+    public long getIssuedAt();
 
-	/**
-	 * @return JWT getSignature
-	 */
-	public String getSignature();
+    /**
+     * @return JWT getSignature
+     */
+    public String getSignature();
 
-	/**
-	 * @return JWT as string in JAVA format
-	 */
-	public String toString();
+    /**
+     * @return JWT as string in JAVA format
+     */
+    public String toString();
 
 }

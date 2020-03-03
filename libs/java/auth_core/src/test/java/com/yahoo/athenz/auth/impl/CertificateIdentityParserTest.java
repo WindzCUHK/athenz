@@ -32,43 +32,6 @@ import org.testng.annotations.Test;
 
 public class CertificateIdentityParserTest {
 
-/*
-	@Test
-	public void testGetDomain() {
-		CertificateAuthority authority = new CertificateAuthority();
-		authority.initialize();
-		assertNull(authority.getDomain());
-	}
-
-	@Test
-	public void testGetHeader() {
-		CertificateAuthority authority = new CertificateAuthority();
-		authority.initialize();
-		assertNull(authority.getHeader());
-	}
-	
-	@Test
-	public void testGetCredSource() {
-		CertificateAuthority authority = new CertificateAuthority();
-		authority.initialize();
-		assertEquals(CredSource.CERTIFICATE, authority.getCredSource());
-	}
-	
-	@Test
-	public void testHeaderAuthenticate() {
-		
-		CertificateAuthority authority = new CertificateAuthority();
-		authority.initialize();
-		assertNull(authority.authenticate("v=U1;d=domain;n=service;s=sig", null, "GET", null));
-	}
-
-	@Test
-	public void testGetAuthenticateChallenge() {
-		CertificateAuthority authority = new CertificateAuthority();
-		assertEquals(authority.getAuthenticateChallenge(), "AthenzX509Certificate realm=\"athenz\"");
-	}
-*/
-
 	private final ClassLoader classLoader = this.getClass().getClassLoader();
 	private final X509Certificate readCert(String resourceName) throws Exception {
 		try (FileInputStream certIs = new FileInputStream(classLoader.getResource(resourceName).getFile())) {

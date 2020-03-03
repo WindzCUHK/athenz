@@ -20,18 +20,18 @@ package com.yahoo.athenz.auth.impl;
  */
 public class CertificateIdentityException extends Exception {
 
-	private static final long serialVersionUID = -3287975953851497109L;
+    private static final long serialVersionUID = -3287975953851497109L;
 
-	public CertificateIdentityException() {
-		super();
-	}
+    public CertificateIdentityException() {
+        super();
+    }
 
-	public CertificateIdentityException(String message) {
-		super(message);
-	}
+    public CertificateIdentityException(String message) {
+        super(message);
+    }
 
-	public CertificateIdentityException(Throwable cause) {
-		super(cause);
-	}
+    public CertificateIdentityException(Throwable cause) {
+        super(cause);
+    }
 
 }

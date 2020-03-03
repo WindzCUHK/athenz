@@ -23,17 +23,17 @@ import com.yahoo.athenz.auth.KeyStore;
  */
 public class DefaultOAuthJwtAccessTokenParserFactory implements OAuthJwtAccessTokenParserFactory {
 
-	public static final String JWKS_URL = "jwks_url";
-	public static final String SYSTEM_PROP_PREFIX = "athenz.auth.oauth.jwt.parser.";
-	public static final BiFunction<String, String, String> getProperty = (String key, String def) -> {
-		return System.getProperty(SYSTEM_PROP_PREFIX + key, def);
-	};
+    public static final String JWKS_URL = "jwks_url";
+    public static final String SYSTEM_PROP_PREFIX = "athenz.auth.oauth.jwt.parser.";
+    public static final BiFunction<String, String, String> GET_PROPERTY = (String key, String def) -> {
+        return System.getProperty(SYSTEM_PROP_PREFIX + key, def);
+    };
 
-	@Override
-	public OAuthJwtAccessTokenParser create(KeyStore keyStore) throws IllegalArgumentException {
-		String jwksUrl = getProperty.apply(JWKS_URL, "https://athenz.io/jwks.json");
+    @Override
+    public OAuthJwtAccessTokenParser create(KeyStore keyStore) throws IllegalArgumentException {
+        String jwksUrl = GET_PROPERTY.apply(JWKS_URL, "https://athenz.io/jwks.json");
 
-		return new DefaultOAuthJwtAccessTokenParser(keyStore, jwksUrl);
-	}
+        return new DefaultOAuthJwtAccessTokenParser(keyStore, jwksUrl);
+    }
 
 }

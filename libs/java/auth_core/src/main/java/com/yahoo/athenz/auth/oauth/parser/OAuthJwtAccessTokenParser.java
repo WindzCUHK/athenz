@@ -15,19 +15,19 @@
  */
 package com.yahoo.athenz.auth.oauth.parser;
 
-import com.yahoo.athenz.auth.oauth.token.OAuthJwtAccessTokenException;
 import com.yahoo.athenz.auth.oauth.token.OAuthJwtAccessToken;
+import com.yahoo.athenz.auth.oauth.token.OAuthJwtAccessTokenException;
 
 /**
  * OAuth2 JWT access token parser interface
  */
 public interface OAuthJwtAccessTokenParser {
 
-	/**
-	 * Parse encoded JWT string to OAuthJwtAccessToken
-	 * @param  jwtString                    encoded JWT string
-	 * @return                              OAuthJwtAccessToken
-	 * @throws OAuthJwtAccessTokenException parse error
-	 */
-	public OAuthJwtAccessToken parse(String jwtString) throws OAuthJwtAccessTokenException;
+    /**
+     * Parse encoded JWT string to OAuthJwtAccessToken
+     * @param  jwtString                    encoded JWT string
+     * @return                              OAuthJwtAccessToken
+     * @throws OAuthJwtAccessTokenException parse error
+     */
+    public OAuthJwtAccessToken parse(String jwtString) throws OAuthJwtAccessTokenException;
 }

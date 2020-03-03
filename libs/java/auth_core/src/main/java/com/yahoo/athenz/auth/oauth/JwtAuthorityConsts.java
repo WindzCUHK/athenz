@@ -20,38 +20,40 @@ package com.yahoo.athenz.auth.oauth;
  */
 public final class JwtAuthorityConsts {
 
-	/*
-	 * Client ID mapping
-	 */
-	public static final String CLIENT_ID_FIELD_DELIMITER = ":";
-	public static final String CLIENT_ID_DELIMITER = ",";
+    /*
+     * Client ID mapping
+     */
+    public static final String CLIENT_ID_FIELD_DELIMITER = ":";
+    public static final String CLIENT_ID_DELIMITER = ",";
 
-	/*
-	 * System properties
-	 */
-	public static final String JA_PROP_AUTHN_CHALLENGE_REALM = "authn_challenge_realm";
-	// certificate
-	public static final String JA_PROP_CERT_EXCLUDED_PRINCIPALS = "cert.excluded_principals";
-	public static final String JA_PROP_CERT_EXCLUDE_ROLE_CERTIFICATES = "cert.exclude_role_certificates";
-	// JWT parser
-	public static final String JA_PROP_PARSER_FACTORY_CLASS = "parser_factory_class";
-	// JWT validator
-	public static final String JA_PROP_VERIFY_CERT_THUMBPRINT = "verify_cert_thumbprint";
-	public static final String JA_PROP_CLAIM_ISS = "claim.iss";
-	public static final String JA_PROP_CLAIM_AUD = "claim.aud";
-	public static final String JA_PROP_CLAIM_SCOPE = "claim.scope";
-	public static final String JA_PROP_CLIENT_ID_MAP_PATH = "client_id_map_path";
-	// general
-	public static final String SYSTEM_PROP_PREFIX = "athenz.auth.oauth.jwt.";
-	public static final String CSV_DELIMITER = ",";
+    /*
+     * System properties
+     */
+    public static final String JA_PROP_AUTHN_CHALLENGE_REALM = "authn_challenge_realm";
+    // certificate
+    public static final String JA_PROP_CERT_EXCLUDED_PRINCIPALS = "cert.excluded_principals";
+    public static final String JA_PROP_CERT_EXCLUDE_ROLE_CERTIFICATES = "cert.exclude_role_certificates";
+    // JWT parser
+    public static final String JA_PROP_PARSER_FACTORY_CLASS = "parser_factory_class";
+    // JWT validator
+    public static final String JA_PROP_VERIFY_CERT_THUMBPRINT = "verify_cert_thumbprint";
+    public static final String JA_PROP_CLAIM_ISS = "claim.iss";
+    public static final String JA_PROP_CLAIM_AUD = "claim.aud";
+    public static final String JA_PROP_CLAIM_SCOPE = "claim.scope";
+    public static final String JA_PROP_CLIENT_ID_MAP_PATH = "client_id_map_path";
+    // general
+    public static final String SYSTEM_PROP_PREFIX = "athenz.auth.oauth.jwt.";
+    public static final String CSV_DELIMITER = ",";
 
-	/*
-	 * OAuth
-	 */
-	public static final String AUTH_HEADER = "Authorization";
-	public static final String BEARER_TYPE = "bearer"; // BEARER_TYPE.toLowerCase()
+    /*
+     * OAuth
+     */
+    public static final String AUTH_HEADER = "Authorization";
+    public static final String BEARER_TYPE = "bearer"; // BEARER_TYPE.toLowerCase()
 
-	// prevent object creation
-	private JwtAuthorityConsts() {}
+    // prevent object creation
+    private JwtAuthorityConsts() {
+        
+    }
 
 }

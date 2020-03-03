@@ -18,9 +18,9 @@ package com.yahoo.athenz.auth.oauth.parser;
 import java.net.MalformedURLException;
 import java.net.URL;
 import com.yahoo.athenz.auth.KeyStore;
-import com.yahoo.athenz.auth.oauth.token.OAuthJwtAccessTokenException;
 import com.yahoo.athenz.auth.oauth.token.DefaultOAuthJwtAccessToken;
 import com.yahoo.athenz.auth.oauth.token.OAuthJwtAccessToken;
+import com.yahoo.athenz.auth.oauth.token.OAuthJwtAccessTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
@@ -32,42 +32,43 @@ import io.jsonwebtoken.SigningKeyResolver;
  */
 public class DefaultOAuthJwtAccessTokenParser implements OAuthJwtAccessTokenParser {
 
-	public static final int ALLOWED_CLOCK_SKEW_SECONDS = 60;
+    public static final int ALLOWED_CLOCK_SKEW_SECONDS = 60;
 
-	protected JwtParser parser = null;
+    protected JwtParser parser = null;
 
-	/**
-	 * Create parser for DefaultOAuthJwtAccessToken
-	 * @param  keyStore                 key store get the JWT public keys
-	 * @param  jwksUrl                  JWKS URL to download the JWT public keys
-	 * @throws IllegalArgumentException key store or JWKS error
-	 */
-	public DefaultOAuthJwtAccessTokenParser(KeyStore keyStore, String jwksUrl) throws IllegalArgumentException {
-		if (keyStore == null) {
-			throw new IllegalArgumentException("DefaultOAuthJwtAccessTokenParser: keyStore is null");
-		}
+    /**
+     * Create parser for DefaultOAuthJwtAccessToken
+     * @param  keyStore                 key store get the JWT public keys
+     * @param  jwksUrl                  JWKS URL to download the JWT public keys
+     * @throws IllegalArgumentException key store or JWKS error
+     */
+    public DefaultOAuthJwtAccessTokenParser(KeyStore keyStore, String jwksUrl) throws IllegalArgumentException {
+        if (keyStore == null) {
+            throw new IllegalArgumentException("DefaultOAuthJwtAccessTokenParser: keyStore is null");
+        }
 
-		SigningKeyResolver signingKeyResolver;
-		try {
-			signingKeyResolver = new KeyStoreJwkKeyResolver(keyStore, new URL(jwksUrl));
-		} catch (MalformedURLException e) {
-			throw new IllegalArgumentException("DefaultOAuthJwtAccessTokenParser: invalid jwksUrl", e);
-		}
-		this.parser = Jwts.parser()
-			.setSigningKeyResolver(signingKeyResolver)
-			.setAllowedClockSkewSeconds(ALLOWED_CLOCK_SKEW_SECONDS);
-	}
+        SigningKeyResolver signingKeyResolver;
+        try {
+            signingKeyResolver = new KeyStoreJwkKeyResolver(keyStore, new URL(jwksUrl));
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("DefaultOAuthJwtAccessTokenParser: invalid jwksUrl", e);
+        }
+        this.parser = Jwts.parserBuilder()
+            .setSigningKeyResolver(signingKeyResolver)
+            .setAllowedClockSkewSeconds(ALLOWED_CLOCK_SKEW_SECONDS)
+            .build();
+    }
 
-	@Override
-	public OAuthJwtAccessToken parse(String jwtString) throws OAuthJwtAccessTokenException {
-		OAuthJwtAccessToken accessToken = null;
-		try {
-			Jws<Claims> jws = this.parser.parseClaimsJws(jwtString);
-			accessToken = new DefaultOAuthJwtAccessToken(jws);
-		} catch (Exception ex) {
-			throw new OAuthJwtAccessTokenException(ex);
-		}
-		return accessToken;
-	}
+    @Override
+    public OAuthJwtAccessToken parse(String jwtString) throws OAuthJwtAccessTokenException {
+        OAuthJwtAccessToken accessToken = null;
+        try {
+            Jws<Claims> jws = this.parser.parseClaimsJws(jwtString);
+            accessToken = new DefaultOAuthJwtAccessToken(jws);
+        } catch (Exception ex) {
+            throw new OAuthJwtAccessTokenException(ex);
+        }
+        return accessToken;
+    }
 
 }

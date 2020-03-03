@@ -42,7 +42,7 @@ public class DefaultOAuthJwtAccessTokenTest {
 		try (PemReader reader = new PemReader(new FileReader(this.getClass().getClassLoader().getResource("jwt_public.key").getFile()))) {
 			pk = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(reader.readPemObject().getContent()));
 		}
-		this.parser = Jwts.parser().setSigningKey(pk).setAllowedClockSkewSeconds(60);
+		this.parser = Jwts.parserBuilder().setSigningKey(pk).setAllowedClockSkewSeconds(60).build();
 	}
 
 
