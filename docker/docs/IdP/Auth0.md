@@ -295,11 +295,11 @@
             "name": "sys.auth:role.admin",
             "modified": "2020-03-05T05:34:16.498Z",
             "members": [
-                "user.github-1234567"
+                "user.github-7654321"
             ],
             "roleMembers": [
                 {
-                "memberName": "user.github-1234567",
+                "memberName": "user.github-7654321",
                 "approved": true,
                 "auditRef": "System Setup"
                 }
@@ -319,7 +319,21 @@
         ```json
         {
             "domain": "user",
-            "service": "github-1234567"
+            "service": "github-7654321"
+        }
+        ```
+    1. verify admin access right of the access token
+        ```bash
+        curl --silent --show-error \
+            -H "Authorization: Bearer ${access_token}" \
+            --cacert "${ATHENZ_CA_PATH}" \
+            --key "${WORKSPACE_DIR}/key.pem" \
+            --cert "${WORKSPACE_DIR}/src_cert_bundle.pem" \
+            "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/access/some-action/sys.auth:some-resources" | jq
+        ```
+        ```json
+        {
+            "granted": true
         }
         ```
 
