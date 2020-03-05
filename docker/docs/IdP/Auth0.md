@@ -115,7 +115,7 @@
     athenz.auth.oauth.jwt.parser.jwks_url=https://athenz-oauth-example.auth0.com/.well-known/jwks.json
     athenz.auth.oauth.jwt.auth0.claim_client_id=https://athenz-oauth-example.auth0.com/client_id
     athenz.auth.oauth.jwt.auth0.claim_confirm=https://athenz-oauth-example.auth0.com/cnf
-    athenz.auth.oauth.jwt.athenz.user_domain=user
+    # athenz.user_domain=user
     ```
 1. update the `DOMAIN_ADMIN` value in [env.sh](../../env.sh) to your github user ID
     1. If you are using `DEV` deployment, please update the `DEV_DOMAIN_ADMIN` value in [env.dev.sh](../../sample/env.dev.sh)

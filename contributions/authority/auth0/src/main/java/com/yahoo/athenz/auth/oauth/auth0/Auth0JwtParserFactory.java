@@ -32,7 +32,7 @@ public class Auth0JwtParserFactory extends DefaultOAuthJwtAccessTokenParserFacto
     public OAuthJwtAccessTokenParser create(KeyStore keyStore) throws IllegalArgumentException {
         Auth0Jwt.setClaimClientId(GET_PROPERTY.apply(CLAIM_CLIENT_ID, Auth0Jwt.getClaimClientId()));
         Auth0Jwt.setClaimConfirm(GET_PROPERTY.apply(CLAIM_CONFIRM, Auth0Jwt.getClaimConfirm()));
-        Auth0Jwt.setUserDomain(GET_PROPERTY.apply(AuthorityConsts.ATHENZ_PROP_USER_DOMAIN, Auth0Jwt.getUserDomain()));
+        Auth0Jwt.setUserDomain(System.getProperty(AuthorityConsts.ATHENZ_PROP_USER_DOMAIN, Auth0Jwt.getUserDomain()));
 
         String jwksUrl = GET_PROPERTY.apply(JWKS_URL, "https://athenz.io/jwks.json");
         return new Auth0JwtParser(keyStore, jwksUrl);

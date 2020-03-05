@@ -133,7 +133,7 @@ export DOMAIN_ADMIN='user.github-<your github ID>'
 - To simplify the set up, we will just configure a single admin.
 ```bash
 # replace the placeholder in the sample configuration
-sed -i "s/user.github-<your github ID>/${DOMAIN_ADMIN}/g" "${ZMS_CONF_DIR}/zms.properties"
+sed -i "s/user\.github-.*$/${DOMAIN_ADMIN}/g" "${ZMS_CONF_DIR}/zms.properties"
 ```
 
 <a id="markdown-7-summary" name="7-summary"></a>

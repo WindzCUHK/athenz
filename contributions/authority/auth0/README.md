@@ -55,7 +55,7 @@ ls ./target/athenz_auth_auth0-*.jar
     athenz.auth.oauth.jwt.parser.jwks_url=https://athenz-oauth-example.auth0.com/.well-known/jwks.json
     athenz.auth.oauth.jwt.auth0.claim_client_id=https://athenz-oauth-example.auth0.com/client_id
     athenz.auth.oauth.jwt.auth0.claim_confirm=https://athenz-oauth-example.auth0.com/cnf
-    athenz.auth.oauth.jwt.athenz.user_domain=user
+    # athenz.user_domain=user
     ```
 
 <a id="markdown-for-developer" name="for-developer"></a>
