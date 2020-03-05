@@ -90,6 +90,7 @@ docker exec --user mysql:mysql \
 echo '4. start ZTS' | colored_cat g
 docker run -d -h "${ZTS_HOST}" \
     -p "${ZTS_PORT}:${ZTS_PORT}" \
+    --dns="${DOCKER_DNS}" \
     --network="${DOCKER_NETWORK}" \
     --user "$(id -u):$(id -g)" \
     -v "${DOCKER_DIR}/zts/var:/opt/athenz/zts/var" \

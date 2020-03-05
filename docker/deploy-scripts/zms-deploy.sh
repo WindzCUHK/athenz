@@ -90,6 +90,7 @@ docker exec --user mysql:mysql \
 echo '4. start ZMS' | colored_cat g
 docker run -d -h "${ZMS_HOST}" \
     -p "${ZMS_PORT}:${ZMS_PORT}" \
+    --dns="${DOCKER_DNS}" \
     --network="${DOCKER_NETWORK}" \
     --user "$(id -u):$(id -g)" \
     -v "${DOCKER_DIR}/zms/var:/opt/athenz/zms/var" \
