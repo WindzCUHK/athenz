@@ -306,7 +306,7 @@
             ]
         }
         ```
-    1. verify the access token
+    1. verify the access token, make sure your github ID is shown
         ```bash
         access_token='<encoded_jwt>'
         curl --silent --show-error \
@@ -322,8 +322,6 @@
             "service": "github-1234567"
         }
         ```
-    1. verify the access token can have admin access
-        1. `WIP`
 
 <a id="markdown-reference" name="reference"></a>
 ## Reference
