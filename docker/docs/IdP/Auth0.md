@@ -95,7 +95,7 @@
 > Reference: [contributions/authority/auth0](../../../contributions/authority/auth0)
 
 1. build `athenz_auth_auth0-*.jar` and move it to `"${DOCKER_DIR}/jars/"`
-1. append the below sample properies to [zms.properies](../../zms/conf/zms.properies) (Update `https://athenz-oauth-example.auth0.com/` to your own domain)
+1. append the below sample properies to [zms.properies](../../zms/conf/zms.properties) (Update the following `https://athenz-oauth-example.auth0.com/` domain to your own domain)
     ```properties
     athenz.auth.oauth.jwt.authn_challenge_realm=registered_users@athenz.io
     athenz.auth.oauth.jwt.cert.exclude_role_certificates=false
@@ -118,6 +118,7 @@
     athenz.auth.oauth.jwt.athenz.user_domain=user
     ```
 1. update the `DOMAIN_ADMIN` value in [env.sh](../../env.sh) to your github user ID
+    1. If you are using `DEV` deployment, please update the `DEV_DOMAIN_ADMIN` value in [env.dev.sh](../../sample/env.dev.sh)
 1. re-deploy ZMS
 
 <a id="markdown-get-access-token" name="get-access-token"></a>

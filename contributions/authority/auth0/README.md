@@ -34,7 +34,7 @@ ls ./target/athenz_auth_auth0-*.jar
     # ZTS server
     athenz.zts.authority_classes=com.yahoo.athenz.auth.oauth.CertificateJwtAccessTokenAuthority
     ```
-1. set CertificateJwtAccessTokenAuthority for Auth0
+1. setup CertificateJwtAccessTokenAuthority for Auth0 (Update the following `https://athenz-oauth-example.auth0.com/` domain to your own domain)
     ```properties
     athenz.auth.oauth.jwt.authn_challenge_realm=registered_users@athenz.io
     athenz.auth.oauth.jwt.cert.exclude_role_certificates=false
