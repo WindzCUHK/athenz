@@ -9,7 +9,7 @@
     - [Setup custom claims](#setup-custom-claims)
     - [Setup Athenz Authority](#setup-athenz-authority)
     - [Get access token](#get-access-token)
-    - [[WIP] Verify access token against ZMS](#wip-verify-access-token-against-zms)
+    - [Verify access token against ZMS](#verify-access-token-against-zms)
     - [Reference](#reference)
 
 <!-- /TOC -->
@@ -139,7 +139,7 @@
     SCOPE='openid%20https%3A%2F%2Fzms.athenz.io%2Fzms%2Fv1' # openid https://zms.athenz.io/zms/v1
     CODE_CHALLENGE='soLgG9cEekJtNh23GxQ1hB4AbqKjcVrkOTWVXMqiUMY'
 
-    tr -d '[:space:]' << CURL_EOF; echo "";
+    tr -d '[:space:]' << CURL_EOF; echo '';
     https://${DOMAIN}/authorize?
         audience=${API_AUDIENCE}&
         scope=${SCOPE}&
@@ -175,7 +175,7 @@
         --data "client_id=${CLIENT_ID}" \
         --data "code_verifier=${YOUR_GENERATED_CODE_VERIFIER}" \
         --data "code=${YOUR_AUTHORIZATION_CODE}" \
-        --data "redirect_uri=${REDIRECT_URI}"; echo "";
+        --data "redirect_uri=${REDIRECT_URI}"; echo '';
     ```
     ```bash
     # sample output
@@ -187,12 +187,115 @@
     }
     ```
 1. You can check the JWT and its claims in [JWT.IO](https://jwt.io/)
-1. To get the JWKS to verify your JWT, `curl "https://${DOMAIN}/.well-known/jwks.json"; echo "";`
+1. To get the JWKS to verify your JWT, `curl "https://${DOMAIN}/.well-known/jwks.json"; echo '';`
 
-<a id="markdown-wip-verify-access-token-against-zms" name="wip-verify-access-token-against-zms"></a>
-## [WIP] Verify access token against ZMS
+<a id="markdown-verify-access-token-against-zms" name="verify-access-token-against-zms"></a>
+## Verify access token against ZMS
 
-`WIP`
+1. Start testing ENV.
+    1. start up testing container
+        ```bash
+        # run testing env.
+        BASE_DIR="`git rev-parse --show-toplevel`"
+        source "${BASE_DIR}/docker/env.sh"
+        docker run --rm -it --network="${DOCKER_NETWORK}" -v "${BASE_DIR}:/athenz" --user "$(id -u):$(id -g)" athenz-setup-env sh
+        ```
+    1. setup testing container
+        ```bash
+        # set up env.
+        BASE_DIR="`git rev-parse --show-toplevel`"
+        source "${BASE_DIR}/docker/env.sh"
+        echo "Done loading ENV. from ${BASE_DIR}/docker/env.sh"
+        if [ -f "${DOCKER_DIR}/setup-scripts/dev-env-exports.sh" ]; then
+            source "${DOCKER_DIR}/setup-scripts/dev-env-exports.sh"
+            echo 'Be careful! You are using the DEV settings in dev-env-exports.sh !!!'
+        fi
+
+        # create workspace
+        WORKSPACE_DIR="${DOCKER_DIR}/sample/workspace"
+        mkdir -p "${WORKSPACE_DIR}"
+
+        # copy CSR config file
+        cp "${DOCKER_DIR}/sample/oauth/config.cnf" "${WORKSPACE_DIR}"
+
+        # setup curl credentials
+        alias admin_curl="curl --cacert ${ATHENZ_CA_PATH} --key ${DOMAIN_ADMIN_CERT_KEY_PATH} --cert ${DOMAIN_ADMIN_CERT_PATH}"
+
+        # variables
+        DOMAIN='testing-domain'
+        SERVICE='My-Athenz-SPA'
+        SERVICE_LOWER=`echo "${SERVICE}" | tr '[:upper:]' '[:lower:]'`
+        PRINCIPAL=`echo "${DOMAIN}.${SERVICE}" | tr '[:upper:]' '[:lower:]'`
+        KEY_ID='test_public_key'
+        ```
+1. Get service certificate from ZTS
+    1. prepare CSR
+        ```bash
+        # create CSR
+        DOMAIN="${DOMAIN}" SERVICE="${SERVICE_LOWER}" openssl req -nodes \
+            -newkey rsa:2048 \
+            -keyout "${WORKSPACE_DIR}/key.pem" \
+            -out "${WORKSPACE_DIR}/csr.pem" \
+            -config "${WORKSPACE_DIR}/config.cnf" -reqexts service_ext
+        openssl req -text -in "${WORKSPACE_DIR}/csr.pem" | grep -e 'Subject:' -e 'DNS:'
+        # create public key
+        openssl rsa -pubout -in "${WORKSPACE_DIR}/key.pem" -out "${WORKSPACE_DIR}/public.pem"
+        ```
+    1. register service to ZMS
+        ```bash
+        # reset
+        # admin_curl --request DELETE --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}"
+
+        # create testing-domain
+        admin_curl --request POST \
+            --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain" \
+            --header 'content-type: application/json' \
+            --data '{"name": "'"${DOMAIN}"'","adminUsers": ["'"${DOMAIN_ADMIN}"'"]}'
+        # create My-Athenz-SPA service
+        PUBLIC_KEY=`base64 -w 0 "${WORKSPACE_DIR}/public.pem" | tr '\+\=\/' '\.\-\_'; echo '';`
+        admin_curl --request PUT \
+            --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}/service/${SERVICE}" \
+            --header 'content-type: application/json' \
+            --data '{"name": "'"${PRINCIPAL}"'","publicKeys": [{"id": "'"${KEY_ID}"'","key": "'${PUBLIC_KEY}'"}]}'
+        admin_curl --silent --request GET --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}/service/${SERVICE}" | jq
+        ```
+    1. get service certificate from ZTS
+        ```bash
+        CSR="$(cat "${WORKSPACE_DIR}/csr.pem" | awk -v ORS='\\n' '1')"
+        admin_curl --silent --request POST \
+            --url "https://${ZTS_HOST}:${ZTS_PORT}/zts/v1/instance/${DOMAIN}/${SERVICE}/refresh" \
+            --header 'content-type: application/json' \
+            --data '{"csr": "'"${CSR}"'","keyId": "'"${KEY_ID}"'"}' \
+            | jq --raw-output '[.certificate, .caCertBundle] | join("")' > "${WORKSPACE_DIR}/src_cert_bundle.pem"
+
+        # verify the service certifiicate
+        curl --silent \
+            --cacert "${ATHENZ_CA_PATH}" \
+            --key "${WORKSPACE_DIR}/key.pem" \
+            --cert "${WORKSPACE_DIR}/src_cert_bundle.pem" \
+            --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}/service/${SERVICE}" | jq
+        ```
+1. Verify the access token from Auth0
+    1. check Athenz domain admin, your github ID should be one of the members
+        ```bash
+        curl --silent \
+            --cacert "${ATHENZ_CA_PATH}" \
+            --key "${WORKSPACE_DIR}/key.pem" \
+            --cert "${WORKSPACE_DIR}/src_cert_bundle.pem" \
+            --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/sys.auth/role/admin" | jq
+        ```
+    1. verify the access token
+        ```bash
+        access_token='<encoded_jwt>'
+        curl --silent \
+            -H "Authorization: Bearer ${access_token}" \
+            --cacert "${ATHENZ_CA_PATH}" \
+            --key "${WORKSPACE_DIR}/key.pem" \
+            --cert "${WORKSPACE_DIR}/src_cert_bundle.pem" \
+            --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}/service/${SERVICE}" | jq
+        ```
+    1. verify the access token can have admin access
+        1. `WIP`
 
 <a id="markdown-reference" name="reference"></a>
 ## Reference
