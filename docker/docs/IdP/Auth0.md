@@ -273,16 +273,38 @@
             --cacert "${ATHENZ_CA_PATH}" \
             --key "${WORKSPACE_DIR}/key.pem" \
             --cert "${WORKSPACE_DIR}/src_cert_bundle.pem" \
-            --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}/service/${SERVICE}" | jq
+            --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/principal" | jq 'del(.token)'
+        ```
+        ```json
+        {
+            "domain": "testing-domain",
+            "service": "my-athenz-spa"
+        }
         ```
 1. Verify the access token from Auth0
-    1. check Athenz domain admin, your github ID should be one of the members
+    1. check Athenz domain admin, make sure your github ID is one of the members
         ```bash
         curl --silent --show-error \
             --cacert "${ATHENZ_CA_PATH}" \
             --key "${WORKSPACE_DIR}/key.pem" \
             --cert "${WORKSPACE_DIR}/src_cert_bundle.pem" \
             --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/sys.auth/role/admin" | jq
+        ```
+        ```json
+        {
+            "name": "sys.auth:role.admin",
+            "modified": "2020-03-05T05:34:16.498Z",
+            "members": [
+                "user.github-1234567"
+            ],
+            "roleMembers": [
+                {
+                "memberName": "user.github-1234567",
+                "approved": true,
+                "auditRef": "System Setup"
+                }
+            ]
+        }
         ```
     1. verify the access token
         ```bash
@@ -292,7 +314,13 @@
             --cacert "${ATHENZ_CA_PATH}" \
             --key "${WORKSPACE_DIR}/key.pem" \
             --cert "${WORKSPACE_DIR}/src_cert_bundle.pem" \
-            --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}/service/${SERVICE}" | jq
+            --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/principal" | jq 'del(.token)'
+        ```
+        ```json
+        {
+            "domain": "user",
+            "service": "github-1234567"
+        }
         ```
     1. verify the access token can have admin access
         1. `WIP`
