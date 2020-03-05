@@ -241,7 +241,7 @@ public class CertificateJwtAccessTokenAuthority implements Authority, AuthorityK
         SimplePrincipal principal = (SimplePrincipal) SimplePrincipal.create(domain, service, jwsString, at.getIssuedAt(), this);
         principal.setUnsignedCreds(at.toString());
         principal.setX509Certificate(clientCert);
-        principal.setRoles(at.getScopes());
+        // principal.setRoles(at.getScopes());
         principal.setApplicationId(clientCertPrincipal);
         principal.setAuthorizedService(this.clientCertPrincipalToAuthorizedService(clientCertPrincipal));
 

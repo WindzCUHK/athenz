@@ -95,7 +95,7 @@
 > Reference: [contributions/authority/auth0](../../../contributions/authority/auth0)
 
 1. build `athenz_auth_auth0-*.jar` and move it to `"${DOCKER_DIR}/jars/"`
-1. append the below sample properies to [zms.properies](../../zms/conf/zms.properties) (Update the following `https://athenz-oauth-example.auth0.com/` domain to your own domain)
+1. append the following sample properties to [zms.properties](../../zms/conf/zms.properties) (Update the following `https://athenz-oauth-example.auth0.com/` domain to your own domain)
     ```properties
     athenz.auth.oauth.jwt.authn_challenge_realm=registered_users@athenz.io
     athenz.auth.oauth.jwt.cert.exclude_role_certificates=false

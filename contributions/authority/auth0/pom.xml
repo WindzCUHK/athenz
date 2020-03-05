@@ -45,8 +45,6 @@
       <groupId>com.yahoo.athenz</groupId>
       <artifactId>athenz-auth-core</artifactId>
       <version>${athenz.version}</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../../../libs/java/auth_core/target/athenz-auth-core-1.8.45.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
