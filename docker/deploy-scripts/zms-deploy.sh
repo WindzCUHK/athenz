@@ -108,7 +108,7 @@ until docker run --rm --entrypoint curl \
     --network="${DOCKER_NETWORK}" \
     --user "$(id -u):$(id -g)" \
     --name athenz-curl athenz-setup-env \
-    -k --silent --output /dev/null "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/status" \
+    -k --silent --show-error --output /dev/null "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/status" \
     ; do
     echo 'ZMS is unavailable - will sleep 3s...'
     sleep 3

@@ -213,7 +213,7 @@
 
         # create workspace
         WORKSPACE_DIR="${DOCKER_DIR}/sample/workspace"
-        mkdir -p "${WORKSPACE_DIR}"
+        mkdir -p "${WORKSPACE_DIR}"; cd "${WORKSPACE_DIR}"
 
         # copy CSR config file
         cp "${DOCKER_DIR}/sample/oauth/config.cnf" "${WORKSPACE_DIR}"
@@ -257,19 +257,19 @@
             --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}/service/${SERVICE}" \
             --header 'content-type: application/json' \
             --data '{"name": "'"${PRINCIPAL}"'","publicKeys": [{"id": "'"${KEY_ID}"'","key": "'${PUBLIC_KEY}'"}]}'
-        admin_curl --silent --request GET --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}/service/${SERVICE}" | jq
+        admin_curl --silent --show-error --request GET --url "https://${ZMS_HOST}:${ZMS_PORT}/zms/v1/domain/${DOMAIN}/service/${SERVICE}" | jq
         ```
-    1. get service certificate from ZTS
+    1. get service certificate from ZTS (It may take few seconds to sync. data from ZMS to ZTS)
         ```bash
         CSR="$(cat "${WORKSPACE_DIR}/csr.pem" | awk -v ORS='\\n' '1')"
-        admin_curl --silent --request POST \
+        admin_curl --silent --show-error --request POST \
             --url "https://${ZTS_HOST}:${ZTS_PORT}/zts/v1/instance/${DOMAIN}/${SERVICE}/refresh" \
             --header 'content-type: application/json' \
             --data '{"csr": "'"${CSR}"'","keyId": "'"${KEY_ID}"'"}' \
             | jq --raw-output '[.certificate, .caCertBundle] | join("")' > "${WORKSPACE_DIR}/src_cert_bundle.pem"
 
         # verify the service certifiicate
-        curl --silent \
+        curl --silent --show-error \
             --cacert "${ATHENZ_CA_PATH}" \
             --key "${WORKSPACE_DIR}/key.pem" \
             --cert "${WORKSPACE_DIR}/src_cert_bundle.pem" \
@@ -278,7 +278,7 @@
 1. Verify the access token from Auth0
     1. check Athenz domain admin, your github ID should be one of the members
         ```bash
-        curl --silent \
+        curl --silent --show-error \
             --cacert "${ATHENZ_CA_PATH}" \
             --key "${WORKSPACE_DIR}/key.pem" \
             --cert "${WORKSPACE_DIR}/src_cert_bundle.pem" \
@@ -287,7 +287,7 @@
     1. verify the access token
         ```bash
         access_token='<encoded_jwt>'
-        curl --silent \
+        curl --silent --show-error \
             -H "Authorization: Bearer ${access_token}" \
             --cacert "${ATHENZ_CA_PATH}" \
             --key "${WORKSPACE_DIR}/key.pem" \
