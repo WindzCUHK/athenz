@@ -1,0 +1,9 @@
+dependencies:
+- name: mariadb
+  repository: https://charts.bitnami.com/bitnami
+  version: 7.3.16
+- name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 2.1.0
+digest: sha256:7994ef1b10d34698a0365ed55a2dc73e9da519c3e58a9bf2ee7976f2b1fcffee
+generated: "2020-05-07T12:17:58.7935+09:00"

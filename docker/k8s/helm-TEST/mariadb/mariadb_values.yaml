@@ -1,0 +1,47 @@
+# existingSecret
+# rootUser:
+#   password: 'mariadb'
+# db:
+#   name: 'zms_server'
+#   user: 'zms_admin'
+#   password: 'athenz'
+# master:
+#   persistence:
+#     enabled: false
+# slave:
+#   persistence:
+#     enabled: false
+
+
+master:
+  extraFlags: "--log_warnings=9"
+  persistence:
+    enabled: false
+slave:
+  persistence:
+    enabled: false
+replication:
+  enabled: true
+existingSecret: false
+rootUser:
+  password: "mariadb_root"
+  forcePassword: true
+  injectSecretsAsVolume: true
+db:
+  name: 'zms_server'
+  user: 'zms_admin'
+  password: 'athenz_admin'
+  forcePassword: true
+  injectSecretsAsVolume: true
+replication:
+  password: "replication"
+  forcePassword: true
+  injectSecretsAsVolume: true
+# initdbScriptsConfigMap: "{{ .Release.Namespace }}-schema"
+volumePermissions:
+    enabled: true
+service:
+  port: 3306
+image:
+  registry: docker.io
+  repository: bitnami/mariadb

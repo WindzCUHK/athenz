@@ -1,0 +1,193 @@
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+## Current available global Docker image parameters: imageRegistry and imagePullSecrets
+##
+# global:
+#   imageRegistry: myRegistryName
+#   imagePullSecrets:
+#     - myRegistryKeySecretName
+#   storageClass: myStorageClass
+
+## Athenz ZMS image version
+## ref: https://hub.docker.com/r/wzyahoo/athenz-zms-server/tags
+##
+image:
+  registry: docker.io
+  repository: wzyahoo/athenz-zms-server
+  setupRepository: wzyahoo/athenz-setup-env
+  tag: latest
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  # pullSecrets:
+  #   - myRegistryKeySecretName
+  ## Set to true if you would like to see extra information on logs
+  ##
+
+## Set up update strategy for wordpress installation. Set to Recreate if you use persistent volume that cannot be mounted by more than one pods to makesure the pods is destroyed first.
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+## Example:
+## updateStrategy:
+##  type: RollingUpdate
+##  rollingUpdate:
+##    maxSurge: 25%
+##    maxUnavailable: 25%
+updateStrategy:
+  type: RollingUpdate
+
+replicaCount: 1
+
+athenz:
+  domainAdmin: user.github-1234567
+  password:
+    keystore: ""
+    truststore: ""
+  # extraProp:
+  #   "athenz.user_domain": "user"
+
+# ./files/secrets/athenz/private.pem
+existingSecret: ""
+# ./files/secrets/tls/zms_cert.pem & zms_key.pem
+existingTlsSecret: ""
+# ./files/secrets/tls/CAs/*.pem
+existingTlsCaSecret: ""
+
+service:
+  annotations: {}
+  port: 4443
+  ## Kubernetes service type, ClusterIP and NodePort are supported at present
+  type: ClusterIP
+  # clusterIp: xx.xx.xx.xx
+  # type: NodePort
+  # nodePort: 4443
+
+## Use an alternate scheduler, e.g. "stork".
+## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+##
+# schedulerName:
+
+## Pod annotations
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+podAnnotations: {}
+
+## Affinity for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+
+## Node labels for pod assignment. Evaluated as a template.
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment. Evaluated as a template.
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
+
+## K8s Security Context for ZMS pods
+## https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  enabled: true
+  fsGroup: 1001
+  runAsUser: 10001
+
+## ZMS pod liveness probes options
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+livenessProbe:
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+## ZMS containers' resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+  limits: {}
+  requests:
+    memory: 1024Mi
+    cpu: 512m
+
+# run after default init. containers
+extraInitContainers: |
+  - name: tls-echo
+    image: {{ template "athenz-zms.setupImage" . }}
+    imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+    env:
+      - name: ZMS_KEYSTORE_PATH
+        value: /opt/athenz/zms/var/certs/zms_keystore.pkcs12
+      - name: ZMS_KEYSTORE_PASS
+        valueFrom:
+          secretKeyRef:
+            name: {{ template "athenz-zms.fullname" . }}
+            key: keystore
+      - name: ZMS_TRUSTSTORE_PATH
+        value: /opt/athenz/zms/var/certs/zms_truststore.jks
+      - name: ZMS_TRUSTSTORE_PASS
+        valueFrom:
+          secretKeyRef:
+            name: {{ template "athenz-zms.fullname" . }}
+            key: truststore
+    command:
+      - "/bin/sh"
+      - "-c"
+      - >-
+        keytool -list -storepass "${ZMS_KEYSTORE_PASS}" -keystore "${ZMS_KEYSTORE_PATH}"; keytool -list -storepass "${ZMS_TRUSTSTORE_PASS}" -keystore "${ZMS_TRUSTSTORE_PATH}"
+    volumeMounts:
+      - name: tls-stores
+        mountPath: /opt/athenz/zms/var/certs
+
+mariadb:
+  # mariadb: {}
+  fullnameOverride: zms-db
+  nameOverride: zms-db
+  master:
+    # extraFlags: "--log_warnings=9"
+    persistence:
+      enabled: false
+  slave:
+    persistence:
+      enabled: false
+  replication:
+    enabled: true
+  existingSecret: false
+  rootUser:
+    password: "mariadb_root"
+    forcePassword: true
+    injectSecretsAsVolume: false
+  db:
+    name: 'zms_server'
+    user: 'zms_admin'
+    password: 'athenz_admin'
+    forcePassword: true
+    injectSecretsAsVolume: false
+  replication:
+    password: "replication"
+    forcePassword: true
+    injectSecretsAsVolume: false
+  # initdbScriptsConfigMap: "{{ .Release.Namespace }}-schema"
+  service:
+    port: 3306
+  image:
+    registry: docker.io
+    repository: bitnami/mariadb
+    pullPolicy: IfNotPresent
+
+ingress-nginx:
+  controller:
+    service:
+      externalIPs:
+        - 172.21.97.103
+  # your service port should have the same value with the ingress
+  tcp:
+    "4443": "{{- printf \"%s/%s\" .Release.Namespace (include \"athenz-zms.fullname\" .) -}}:4443"
