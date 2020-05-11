@@ -32,7 +32,6 @@ public class DefaultOAuthJwtAccessTokenParserFactory implements OAuthJwtAccessTo
     @Override
     public OAuthJwtAccessTokenParser create(KeyStore keyStore) throws IllegalArgumentException {
         final String jwksUrl = GET_PROPERTY.apply(JWKS_URL, null);
-
         return new DefaultOAuthJwtAccessTokenParser(keyStore, jwksUrl);
     }
 
