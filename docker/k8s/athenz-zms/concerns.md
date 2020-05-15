@@ -1,6 +1,6 @@
 # concerns
 
-1. nginx TCP proxy (external IPs) / TLS passthrough
+1. [discuss] nginx TCP proxy (external IPs) / TLS passthrough
     1. ZMS certificate CN
         1. `echo "curl: (51) SSL: no alternative certificate subject name matches target host name 'kmaster.wfan'`
     1. related configs
@@ -10,17 +10,17 @@
         1. [kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx/tree/master/charts/ingress-nginx)
         1. [controller.enableTLSPassthrough](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/)
 
-1. need PVC for ZMS?
+1. [yes/no] need PVC for ZMS?
     1. can export log using sidecar
-1. need metric support?
-1. docker repo, using personal now
+1. [yes/no] need metric support?
+1. [discuss] docker repo, using personal now
     1. https://hub.docker.com/r/wzyahoo/athenz-zms-server/tags
-1. add debug flag, change log level?
-1. using external DB?
-1. zms/status === liveness/readiness @@
-1. ZMS resources default
+1. [yes/no] add debug flag, change log level?
+1. [confirm] using external DB?
+1. [discuss] zms/status === liveness/readiness @@
+1. [discuss] ZMS resources default
 1. `extraProp` to overwrite athenz.proporties
-1. duplicated template in `_helpers.tpl`
+1. [later] duplicated template in `_helpers.tpl`
     1. seems can be fixed (study later)
         1. [Getting Title at 28:53](https://github.com/bitnami/charts/blob/6b59bd8ca6fcafbfb27e611182b4d4c9c1bf122d/bitnami/wordpress/templates/_helpers.tpl#L204-L215)
     1. [Usable sub-charts templates from parent chart · Issue #3920 · helm/helm](https://github.com/helm/helm/issues/3920)
@@ -28,8 +28,8 @@
     1. as helm has problems to use templates across charts, we have to copy subcharts template to parent chart. (may break depenedency if the subchart updated)
     1. P.S. value supports only scalar (no code)
 1. about DB
-    1. need to enable SSL
-    1. `injectSecretsAsVolume=true` not working
+    1. [yes/no] need to enable SSL
+    1. [later] `injectSecretsAsVolume=true` not working
 
 ## reference
 
