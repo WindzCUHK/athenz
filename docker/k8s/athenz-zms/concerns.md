@@ -10,15 +10,15 @@
         1. [kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx/tree/master/charts/ingress-nginx)
         1. [controller.enableTLSPassthrough](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/)
 
+1. [discuss] docker repo, using personal now
+    1. https://hub.docker.com/r/wzyahoo/athenz-zms-server/tags
+1. [discuss] zms/status === liveness/readiness @@
+1. [discuss] ZMS resources default
 1. [yes/no] need PVC for ZMS?
     1. can export log using sidecar
 1. [yes/no] need metric support?
-1. [discuss] docker repo, using personal now
-    1. https://hub.docker.com/r/wzyahoo/athenz-zms-server/tags
 1. [yes/no] add debug flag, change log level?
 1. [confirm] using external DB?
-1. [discuss] zms/status === liveness/readiness @@
-1. [discuss] ZMS resources default
 1. `extraProp` to overwrite athenz.proporties
 1. [later] duplicated template in `_helpers.tpl`
     1. seems can be fixed (study later)
