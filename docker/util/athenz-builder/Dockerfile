@@ -38,8 +38,8 @@ RUN tar xvzf ./assembly/zts/target/athenz-zts*-bin.tar.gz -C /tmp/zts \
     && mv /tmp/zts/lib /opt/athenz/zts/lib \
     && mv /tmp/zts/webapps /opt/athenz/zts/webapps
 
-RUN cp -n ./contributions/metric/prometheus/target/*.jar ./contributions/metric/prometheus/target/dependency/*.jar /opt/athenz/zms/lib/jars \
-    && cp -n ./contributions/metric/prometheus/target/*.jar ./contributions/metric/prometheus/target/dependency/*.jar /opt/athenz/zts/lib/jars
+RUN cp -u ./contributions/metric/prometheus/target/*.jar ./contributions/metric/prometheus/target/dependency/*.jar /opt/athenz/zms/lib/jars \
+    && cp -u ./contributions/metric/prometheus/target/*.jar ./contributions/metric/prometheus/target/dependency/*.jar /opt/athenz/zts/lib/jars
 
 WORKDIR /opt/athenz
 
