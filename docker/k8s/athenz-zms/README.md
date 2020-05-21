@@ -60,10 +60,10 @@ helm dependency update ./k8s/athenz-zms
 helm lint ./k8s/athenz-zms
 
 # dry run
-helm install --namespace default wzzms ./k8s/athenz-zms --dry-run --debug --set-file mariadb.initdbScripts."zms_server\.sql"=${BASE_DIR}/docker/k8s/athenz-zms/files/schema/zms_server.sql > ./k8s/zms_gen.yaml
+helm install --namespace default wzzms ./k8s/athenz-zms --dry-run --debug > ./k8s/zms_gen.yaml
 
 # install
-helm install --namespace default wzzms ./k8s/athenz-zms --set-file mariadb.initdbScripts."zms_server\.sql"=${BASE_DIR}/docker/k8s/athenz-zms/files/schema/zms_server.sql
+helm install --namespace default wzzms ./k8s/athenz-zms
 # helm upgrade --namespace default wzzms ./k8s/athenz-zms
 
 # uninstall
@@ -71,7 +71,7 @@ helm delete --namespace default wzzms
 
 # debug ZMS
 kubectl describe $(kubectl get pod -l "app=athenz-zms" -o name)
-kubectl logs --tail=10 --all-containers $(kubectl get pod -l "app=athenz-zms" -o name)
+kubectl logs --tail=30 --all-containers $(kubectl get pod -l "app=athenz-zms" -o name)
 kubectl exec -it $(kubectl get pod -l "app=athenz-zms" -o name) -- /bin/sh
 less /opt/athenz/zms/logs/zms_server/server.log
 # grep "ERROR" /opt/athenz/zms/logs/zms_server/server.log

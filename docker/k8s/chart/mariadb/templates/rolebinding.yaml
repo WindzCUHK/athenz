@@ -1,6 +1,6 @@
-{{- if and .Values.serviceAccount.create  .Values.rbac.create }}
+{{- if and .Values.serviceAccount.create .Values.rbac.create }}
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
 metadata:
   name: {{ template "master.fullname" . }}
   labels:
@@ -8,11 +8,11 @@ metadata:
     chart: "{{ template "mariadb.chart" . }}"
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
-rules:
-- apiGroups:
-    - ""
-  resources:
-    - endpoints
-  verbs:
-    - get
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "mariadb.serviceAccountName" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "master.fullname" . }}
 {{- end }}

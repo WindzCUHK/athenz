@@ -14,8 +14,13 @@
 image:
   registry: docker.io
   repository: wzyahoo/athenz-zms-server
-  setupRepository: wzyahoo/athenz-setup-env
   tag: latest
+  setup:
+    repository: wzyahoo/athenz-setup-env
+    tag: latest
+  mysql:
+    repository: mariadb
+    tag: '10.5.2'
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -43,20 +48,32 @@ updateStrategy:
 
 replicaCount: 1
 
-athenz:
-  domainAdmin: user.github-1234567
-  password:
-    keystore: ""
-    truststore: ""
-  # extraProp:
-  #   "athenz.user_domain": "user"
+password:
+  jdbc: "athenz_admin"
+  jdbcRo: "athenz_admin"
+  # keystore: ""
+  # truststore: ""
+files:
+  zmsKey: "files/secrets/zms/private.pem"
+  tls:
+    crt: "files/secrets/tls/zms_cert.pem"
+    key: "files/secrets/tls/zms_key.pem"
+    ca:
+      - "files/secrets/tls/CAs/athenz_ca.pem"
+      - "files/secrets/tls/CAs/service_ca.pem"
+      - "files/secrets/tls/CAs/user_ca.pem"
+  conf: "files/conf/*"
 
-# ./files/secrets/athenz/private.pem
-existingSecret: ""
-# ./files/secrets/tls/zms_cert.pem & zms_key.pem
-existingTlsSecret: ""
-# ./files/secrets/tls/CAs/*.pem
-existingTlsCaSecret: ""
+## keys: private.pem (.files.zmsKey), keystore, truststore, jdbc (.password.jdbc), jdbcRo (.password.jdbcRo)
+existingSecret: "wzzms-athenz-zms-2"
+# .files.tls.crt and .files.tls.key
+# existingTLSSecret: "wzzms-athenz-zms-tls-2"
+# .files.tls.ca
+# existingTLSCASecret: "wzzms-athenz-zms-tls-ca-2"
+
+# overwrite existingTLSSecret and existingTLSCASecret
+# keys: zms_keystore.pkcs12, zms_truststore.jks
+existingTLSStoreSecret: "wzzms-athenz-zms-tls-store-2"
 
 service:
   annotations: {}
@@ -78,7 +95,7 @@ service:
 podAnnotations: {}
 
 ## Affinity for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ##
 affinity: {}
 
@@ -102,6 +119,7 @@ securityContext:
 
 ## ZMS pod liveness probes options
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+##
 livenessProbe:
   initialDelaySeconds: 120
   periodSeconds: 10
@@ -109,19 +127,29 @@ livenessProbe:
   failureThreshold: 6
   successThreshold: 1
 
-## ZMS containers' resource requests and limits
+## ZMS containers' resource requests and limits (default: for alpha env.)
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
 resources:
   limits: {}
   requests:
-    memory: 1024Mi
-    cpu: 512m
+    memory: 4096Mi
+    cpu: 500m
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  enabled: true
+  # storageClass: "-"
+  # existingClaim: your-claim
+  accessMode: ReadWriteOnce
+  size: 4Gi
 
 # run after default init. containers
 extraInitContainers: |
   - name: tls-echo
-    image: {{ template "athenz-zms.setupImage" . }}
+    image: {{ template "athenz-zms.setup.image" . }}
     imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
     env:
       - name: ZMS_KEYSTORE_PATH
@@ -129,14 +157,14 @@ extraInitContainers: |
       - name: ZMS_KEYSTORE_PASS
         valueFrom:
           secretKeyRef:
-            name: {{ template "athenz-zms.fullname" . }}
+            name: {{ template "athenz-zms.secretName" . }}
             key: keystore
       - name: ZMS_TRUSTSTORE_PATH
         value: /opt/athenz/zms/var/certs/zms_truststore.jks
       - name: ZMS_TRUSTSTORE_PASS
         valueFrom:
           secretKeyRef:
-            name: {{ template "athenz-zms.fullname" . }}
+            name: {{ template "athenz-zms.secretName" . }}
             key: truststore
     command:
       - "/bin/sh"
@@ -147,41 +175,7 @@ extraInitContainers: |
       - name: tls-stores
         mountPath: /opt/athenz/zms/var/certs
 
-mariadb:
-  # mariadb: {}
-  fullnameOverride: zms-db
-  nameOverride: zms-db
-  master:
-    # extraFlags: "--log_warnings=9"
-    persistence:
-      enabled: false
-  slave:
-    persistence:
-      enabled: false
-  replication:
-    enabled: true
-  existingSecret: false
-  rootUser:
-    password: "mariadb_root"
-    forcePassword: true
-    injectSecretsAsVolume: false
-  db:
-    name: 'zms_server'
-    user: 'zms_admin'
-    password: 'athenz_admin'
-    forcePassword: true
-    injectSecretsAsVolume: false
-  replication:
-    password: "replication"
-    forcePassword: true
-    injectSecretsAsVolume: false
-  # initdbScriptsConfigMap: "{{ .Release.Namespace }}-schema"
-  service:
-    port: 3306
-  image:
-    registry: docker.io
-    repository: bitnami/mariadb
-    pullPolicy: IfNotPresent
+# sidecarContainers: |
 
 ingress-nginx:
   controller:

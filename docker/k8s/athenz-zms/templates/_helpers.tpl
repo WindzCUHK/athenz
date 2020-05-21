@@ -41,10 +41,28 @@ Return the proper ZMS image name
 {{/*
 Return the proper ZMS setup image name
 */}}
-{{- define "athenz-zms.setupImage" -}}
+{{- define "athenz-zms.setup.image" -}}
 {{- $registryName := .Values.image.registry -}}
-{{- $repositoryName := .Values.image.setupRepository -}}
-{{- $tag := .Values.image.tag | toString -}}
+{{- $repositoryName := .Values.image.setup.repository -}}
+{{- $tag := .Values.image.setup.tag | toString -}}
+{{- if .Values.global }}
+    {{- if .Values.global.imageRegistry }}
+        {{- printf "%s/%s:%s" .Values.global.imageRegistry $repositoryName $tag -}}
+    {{- else -}}
+        {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
+    {{- end -}}
+{{- else -}}
+    {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the proper ZMS mysql image name
+*/}}
+{{- define "athenz-zms.mysql.image" -}}
+{{- $registryName := .Values.image.registry -}}
+{{- $repositoryName := .Values.image.mysql.repository -}}
+{{- $tag := .Values.image.mysql.tag | toString -}}
 {{- if .Values.global }}
     {{- if .Values.global.imageRegistry }}
         {{- printf "%s/%s:%s" .Values.global.imageRegistry $repositoryName $tag -}}
@@ -90,8 +108,8 @@ Return the name of the Secret storing the private key and passwords
 Return the name of the TLS Secret
 */}}
 {{- define "athenz-zms.tls.secretName" -}}
-{{- if .Values.existingTlsSecret -}}
-{{ .Values.existingTlsSecret }}
+{{- if .Values.existingTLSSecret -}}
+{{ .Values.existingTLSSecret }}
 {{- else -}}
 {{ template "athenz-zms.fullname" . }}-tls
 {{- end -}}
@@ -101,104 +119,51 @@ Return the name of the TLS Secret
 Return the name of the Secret storing the trusted CA certificates
 */}}
 {{- define "athenz-zms.tls.ca.secretName" -}}
-{{- if .Values.existingTlsCaSecret -}}
-{{ .Values.existingTlsCaSecret }}
+{{- if .Values.existingTLSCASecret -}}
+{{ .Values.existingTLSCASecret }}
 {{- else -}}
 {{ template "athenz-zms.fullname" . }}-tls-ca
 {{- end -}}
 {{- end -}}
 
 {{/*
-DB service port
+Return the JDBC host and port in conf
 */}}
-{{- define "athenz-zms.jdbc.port" -}}
-{{ .Values.mariadb.service.port | toString }}
+{{- define "athenz-zms.jdbc.userHostPort" -}}
+{{- $file := .Files -}}
+{{- $return := dict "user" "" "jdbc" "" -}}
+{{- range $path, $byte := .Files.Glob .Values.files.conf -}}
+    {{- range $line := $file.Lines $path }}
+        {{- $found := regexFind "^athenz\\.zms\\.jdbc_user=(.+)$" $line }}
+        {{- if $found }}
+            {{- $_ := ($found | trimPrefix "athenz.zms.jdbc_user=" | set $return "user") }}
+        {{- end }}
+        {{- $found := regexFind "^athenz\\.zms\\.jdbc_store=jdbc:mysql:\\/\\/([^:]+):(\\d+)" $line }}
+        {{- if $found }}
+            {{- $_ := ($found | trimPrefix "athenz.zms.jdbc_store=jdbc:mysql://" | set $return "jdbc") }}
+        {{- end }}
+    {{- end }}
+{{- end -}}
+{{- printf "%s:%s" (get $return "user") (get $return "jdbc") -}}
 {{- end -}}
 
 {{/*
-DB master host
+Return the JDBC RO host and port in conf
 */}}
-{{- define "athenz-zms.jdbc.master.host" -}}
-{{- printf "%s.%s.svc.cluster.local" (include "athenz-zms.mariadb.fullname" .) .Release.Namespace -}}
+{{- define "athenz-zms.jdbc.ro.userHostPort" -}}
+{{- $file := .Files -}}
+{{- $return := dict "user" "" "jdbc" "" -}}
+{{- range $path, $byte := .Files.Glob .Values.files.conf -}}
+    {{- range $line := $file.Lines $path }}
+        {{- $found := regexFind "^athenz\\.zms\\.jdbc_ro_user=(.+)$" $line }}
+        {{- if $found }}
+            {{- $_ := ($found | trimPrefix "athenz.zms.jdbc_ro_user=" | set $return "user") }}
+        {{- end }}
+        {{- $found := regexFind "^athenz\\.zms\\.jdbc_ro_store=jdbc:mysql:\\/\\/([^:]+):(\\d+)" $line }}
+        {{- if $found }}
+            {{- $_ := ($found | trimPrefix "athenz.zms.jdbc_ro_store=jdbc:mysql://" | set $return "jdbc") }}
+        {{- end }}
+    {{- end }}
 {{- end -}}
-
-{{/*
-DB master JDBC URL
-*/}}
-{{- define "athenz-zms.jdbc.master.url" -}}
-{{- printf "jdbc:mysql://%s:%s/%s" (include "athenz-zms.jdbc.master.host" .) (include "athenz-zms.jdbc.port" .) .Values.mariadb.db.name -}}
-{{- end -}}
-
-{{/*
-DB slave host
-*/}}
-{{- define "athenz-zms.jdbc.slave.host" -}}
-{{- printf "%s.%s.svc.cluster.local" (include "athenz-zms.mariadb.slave.fullname" .) .Release.Namespace -}}
-{{- end -}}
-
-{{/*
-DB slave JDBC URL
-*/}}
-{{- define "athenz-zms.jdbc.slave.url" -}}
-{{- printf "jdbc:mysql://%s:%s/%s" (include "athenz-zms.jdbc.slave.host" .) (include "athenz-zms.jdbc.port" .) .Values.mariadb.db.name -}}
-{{- end -}}
-
-{{/*
-****************************************************************
-*** Copy from mariadb
-****************************************************************
-*/}}
-{{- define "athenz-zms.mariadb.image" -}}
-{{- $registryName := .Values.mariadb.image.registry -}}
-{{- $repositoryName := .Values.mariadb.image.repository -}}
-{{- $tag := .Values.mariadb.image.tag | toString -}}
-{{- if .Values.global }}
-    {{- if .Values.global.imageRegistry }}
-        {{- printf "%s/%s:%s" .Values.global.imageRegistry $repositoryName $tag -}}
-    {{- else -}}
-        {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
-    {{- end -}}
-{{- else -}}
-    {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-****************************************************************
-*** Copy from mariadb, with hard-coded chart name
-****************************************************************
-*/}}
-{{- define "athenz-zms.mariadb.fullname" -}}
-{{- if .Values.mariadb.fullnameOverride -}}
-{{- .Values.mariadb.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default "mariadb" .Values.mariadb.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- printf .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-****************************************************************
-*** Copy from mariadb
-****************************************************************
-*/}}
-{{- define "athenz-zms.mariadb.master.fullname" -}}
-{{- if .Values.mariadb.replication.enabled -}}
-{{- printf "%s-%s" (include "athenz-zms.mariadb.fullname" .) "master" | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- include "athenz-zms.mariadb.fullname" . -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-****************************************************************
-*** Copy from mariadb
-****************************************************************
-*/}}
-{{- define "athenz-zms.mariadb.slave.fullname" -}}
-{{- printf "%s-%s" (include "athenz-zms.mariadb.fullname" .) "slave" | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s:%s" (get $return "user") (get $return "jdbc") -}}
 {{- end -}}

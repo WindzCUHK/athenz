@@ -44,9 +44,11 @@ spec:
         fsGroup: {{ .Values.securityContext.fsGroup }}
         runAsUser: {{ .Values.securityContext.runAsUser }}
       {{- end }}
+
       initContainers:
+        {{- if not .Values.existingTLSStoreSecret }}
         - name: tls-keystore
-          image: {{ template "athenz-zms.setupImage" . }}
+          image: {{ template "athenz-zms.setup.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           env:
             - name: ZMS_KEYSTORE_PATH
@@ -71,7 +73,7 @@ spec:
             - name: tls-stores
               mountPath: /opt/athenz/zms/var/certs
         - name: tls-truststore
-          image: {{ template "athenz-zms.setupImage" . }}
+          image: {{ template "athenz-zms.setup.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           env:
             - name: ZMS_TRUSTSTORE_PATH
@@ -91,48 +93,49 @@ spec:
               mountPath: /opt/athenz/zms/var/tls/CAs
             - name: tls-stores
               mountPath: /opt/athenz/zms/var/certs
+        {{- end }}
+        {{- $jdbcURP := (include "athenz-zms.jdbc.userHostPort" .) }}
+        {{- if not (hasSuffix ":" $jdbcURP) }}
+        {{- $jdbcURPList := (splitList ":" $jdbcURP) }}
         - name: wait-for-master-db
-          image: {{ template "athenz-zms.mariadb.image" . }}
-          imagePullPolicy: {{ .Values.mariadb.image.pullPolicy | quote }}
+          image: {{ template "athenz-zms.mysql.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           command:
             - "/bin/sh"
             - "/bin/wait-for-mysql.sh"
-            - "--user='root'"
-            - {{ printf "--host=%s" (include "athenz-zms.jdbc.master.host" .) }}
-            - {{ printf "--port=%s" (include "athenz-zms.jdbc.port" .) }}
+            - {{ printf "--user=%s" (index $jdbcURPList 0) }}
+            - {{ printf "--host=%s" (index $jdbcURPList 1) }}
+            - {{ printf "--port=%s" (index $jdbcURPList 2) }}
           env:
             - name: MYSQL_PWD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "athenz-zms.mariadb.fullname" . }}
-                  key: mariadb-root-password
+                  name: {{ template "athenz-zms.secretName" . }}
+                  key: jdbc
           volumeMounts:
-            - name: master-db-cnf
-              mountPath: /opt/bitnami/mariadb/conf/my.cnf
-              subPath: my.cnf
             - name: script
               mountPath: /bin/wait-for-mysql.sh
               subPath: wait-for-mysql.sh
-        {{- if .Values.mariadb.replication.enabled }}
+        {{- end }}
+        {{- $jdbcRoUHP := (include "athenz-zms.jdbc.ro.userHostPort" .) }}
+        {{- if not (hasSuffix ":" $jdbcRoUHP) }}
+        {{- $jdbcRoUHPList := (splitList ":" $jdbcRoUHP) }}
         - name: wait-for-slave-db
-          image: {{ template "athenz-zms.mariadb.image" . }}
-          imagePullPolicy: {{ .Values.mariadb.image.pullPolicy | quote }}
+          image: {{ template "athenz-zms.mysql.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           command:
             - "/bin/sh"
             - "/bin/wait-for-mysql.sh"
-            - {{ printf "--user=%s" .Values.mariadb.replication.user }}
-            - {{ printf "--host=%s" (include "athenz-zms.jdbc.slave.host" .) }}
-            - {{ printf "--port=%s" (include "athenz-zms.jdbc.port" .) }}
+            - {{ printf "--user=%s" (index $jdbcRoUHPList 0) }}
+            - {{ printf "--host=%s" (index $jdbcRoUHPList 1) }}
+            - {{ printf "--port=%s" (index $jdbcRoUHPList 2) }}
           env:
             - name: MYSQL_PWD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "athenz-zms.mariadb.fullname" . }}
-                  key: mariadb-replication-password
+                  name: {{ template "athenz-zms.secretName" . }}
+                  key: jdbcRo
           volumeMounts:
-            - name: slave-db-cnf
-              mountPath: /opt/bitnami/mariadb/conf/my.cnf
-              subPath: my.cnf
             - name: script
               mountPath: /bin/wait-for-mysql.sh
               subPath: wait-for-mysql.sh
@@ -141,13 +144,22 @@ spec:
 {{ tpl .Values.extraInitContainers . | indent 8 }}
         {{- end }}
       containers:
+        {{- if .Values.sidecarContainers }}
+{{ tpl .Values.sidecarContainers . | nindent 8 }}
+        {{- end }}
         - name: zms
           image: wzyahoo/athenz-zms-server
           env:
             - name: ZMS_DB_ADMIN_PASS
-              value: {{ .Values.mariadb.db.password }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "athenz-zms.secretName" . }}
+                  key: jdbc
             - name: ZMS_RODB_ADMIN_PASS
-              value: {{ .Values.mariadb.db.password }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "athenz-zms.secretName" . }}
+                  key: jdbcRo
             - name: ZMS_KEYSTORE_PASS
               valueFrom:
                 secretKeyRef:
@@ -186,14 +198,6 @@ spec:
           resources: {{- toYaml .Values.resources | nindent 12 }}
           {{- end }}
       volumes:
-        - name: master-db-cnf
-          configMap:
-            name: {{ template "athenz-zms.mariadb.master.fullname" . }}
-        {{- if .Values.mariadb.replication.enabled }}
-        - name: slave-db-cnf
-          configMap:
-            name: {{ template "athenz-zms.mariadb.slave.fullname" . }}
-        {{- end }}
         - name: script
           configMap:
             name: {{ template "athenz-zms.fullname" . }}-script
@@ -207,13 +211,27 @@ spec:
               - key: private.pem
                 path: private.pem
                 mode: 400
+        {{- if not .Values.existingTLSStoreSecret }}
         - name: tls
           secret:
             secretName: {{ template "athenz-zms.tls.secretName" . }}
         - name: tls-ca
           secret:
             secretName: {{ template "athenz-zms.tls.ca.secretName" . }}
+        {{- end }}
         - name: tls-stores
+          {{- if .Values.existingTLSStoreSecret }}
+          secret:
+            secretName: {{ .Values.existingTLSStoreSecret }}
+            items:
+              - key: zms_keystore.pkcs12
+                path: zms_keystore.pkcs12
+                mode: 400
+              - key: zms_truststore.jks
+                path: zms_truststore.jks
+                mode: 400
+          {{- else }}
           emptyDir: {}
+          {{- end }}
         - name: log
           emptyDir: {}

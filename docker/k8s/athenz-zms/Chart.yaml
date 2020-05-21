@@ -19,18 +19,6 @@ engine: gotpl
 kubeVersion: ">=1.16.0-0"
 
 dependencies:
-  - name: mariadb
-    version: 7.3.16
-    repository: https://charts.bitnami.com/bitnami
   - name: ingress-nginx
     version: 2.1.0
     repository: https://kubernetes.github.io/ingress-nginx
-    # import-values:
-    #   - child: service
-    #     parent: myimports
-
-    # condition: (optional) A yaml path that resolves to a boolean, used for enabling/disabling charts (e.g. subchart1.enabled )
-    # tags: # (optional)
-    #   - Tags can be used to group charts for enabling/disabling together
-    # enabled: (optional) Enabled bool determines if chart should be loaded
-    # alias: (optional) Alias usable alias to be used for the chart. Useful when you have to add the same chart multiple times
