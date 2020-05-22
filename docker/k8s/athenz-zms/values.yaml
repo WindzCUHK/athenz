@@ -75,15 +75,6 @@ existingSecret: "wzzms-athenz-zms-2"
 # keys: zms_keystore.pkcs12, zms_truststore.jks
 existingTLSStoreSecret: "wzzms-athenz-zms-tls-store-2"
 
-service:
-  annotations: {}
-  port: 4443
-  ## Kubernetes service type, ClusterIP and NodePort are supported at present
-  type: ClusterIP
-  # clusterIp: xx.xx.xx.xx
-  # type: NodePort
-  # nodePort: 4443
-
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
 ##
@@ -117,15 +108,22 @@ securityContext:
   fsGroup: 1001
   runAsUser: 10001
 
-## ZMS pod liveness probes options
+## ZMS pod extra options for liveness and readiness probes
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
 ##
 livenessProbe:
   initialDelaySeconds: 120
   periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 6
+  timeoutSeconds: 1
   successThreshold: 1
+  failureThreshold: 3
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 3
 
 ## ZMS containers' resource requests and limits (default: for alpha env.)
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -136,15 +134,44 @@ resources:
     memory: 4096Mi
     cpu: 500m
 
-## Enable persistence using Persistent Volume Claims
-## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+## Kubernetes configuration
+## For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP
+## ZMS requires mTLS for authentication. Direct TCP forwarding is preferred in ingress or load balancer.
 ##
-persistence:
-  enabled: true
-  # storageClass: "-"
-  # existingClaim: your-claim
-  accessMode: ReadWriteOnce
-  size: 4Gi
+service:
+  annotations: {}
+  port: 4443
+
+  # type: cluster
+  # clusterIP: ""
+
+  ## List of IP addresses at which the controller services are available
+  ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+  ##
+  externalIPs: []
+
+  # loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+
+  ## Set external traffic policy to: "Local" to preserve source IP on
+  ## providers supporting it
+  ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
+  # externalTrafficPolicy: ""
+
+  # Must be either "None" or "ClientIP" if set. Kubernetes will default to "None".
+  # Ref: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
+  # sessionAffinity: ""
+
+  # specifies the health check node port (numeric port number) for the service. If healthCheckNodePort isn’t specified,
+  # the service controller allocates a port from your cluster’s NodePort range.
+  # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  # healthCheckNodePort: 0
+
+  type: LoadBalancer
+
+  # type: NodePort
+  nodePort: 30007
+# ------
 
 # run after default init. containers
 extraInitContainers: |
@@ -177,11 +204,6 @@ extraInitContainers: |
 
 # sidecarContainers: |
 
-ingress-nginx:
-  controller:
-    service:
-      externalIPs:
-        - 172.21.97.103
-  # your service port should have the same value with the ingress
-  tcp:
-    "4443": "{{- printf \"%s/%s\" .Release.Namespace (include \"athenz-zms.fullname\" .) -}}:4443"
+## Prometheus Metrics
+# ZMS has built-in support of prometheus.
+# Annotation will be injected automatically when the related properties are set in the config files.

@@ -76,6 +76,7 @@ kubectl exec -it $(kubectl get pod -l "app=athenz-zms" -o name) -- /bin/sh
 less /opt/athenz/zms/logs/zms_server/server.log
 # grep "ERROR" /opt/athenz/zms/logs/zms_server/server.log
 # ls -l -R /opt/athenz/zms/var
+# wget localhost:8181/metrics
 
 # restart ZMS
 kubectl delete $(kubectl get pod -l "app=athenz-zms" -o name)
@@ -91,7 +92,7 @@ kubectl logs wzzms-zms-db-master-0
 BASE_DIR="`git rev-parse --show-toplevel`"
 
 # ZMS status
-ZMS_URL=https://kmaster.wfan.ssk.ynwm.yahoo.co.jp:4443
+ZMS_URL=https://kmaster.wfan.ssk.ynwm.yahoo.co.jp:30007
 curl --silent --fail --show-error --request GET -k \
     --url "${ZMS_URL}/zms/v1/status" | jq
 

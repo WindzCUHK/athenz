@@ -167,3 +167,30 @@ Return the JDBC RO host and port in conf
 {{- end -}}
 {{- printf "%s:%s" (get $return "user") (get $return "jdbc") -}}
 {{- end -}}
+
+{{/*
+Return the metrics port, empty string if disable
+*/}}
+{{- define "athenz-zms.metrics.port" -}}
+{{- $file := .Files -}}
+{{- $enable := false -}}
+{{- $httpEnable := false -}}
+{{- $port := "" -}}
+{{- range $path, $byte := .Files.Glob .Values.files.conf -}}
+    {{- range $line := $file.Lines $path }}
+        {{- if eq $line "athenz.metrics.prometheus.enable=true" }}
+            {{- $enable = true }}
+        {{- end }}
+        {{- if eq $line "athenz.metrics.prometheus.http_server.enable=true" }}
+            {{- $httpEnable = true }}
+        {{- end }}
+        {{- $found := regexFind "^athenz\\.metrics\\.prometheus\\.http_server\\.port=(\\d+)$" $line }}
+        {{- if $found }}
+            {{- $port = ($found | trimPrefix "athenz.metrics.prometheus.http_server.port=") }}
+        {{- end }}
+    {{- end }}
+{{- end -}}
+{{- if and $enable $httpEnable -}}
+{{- $port -}}
+{{- end -}}
+{{- end -}}

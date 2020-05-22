@@ -35,3 +35,4 @@
 
 - [bitnami/charts](https://github.com/bitnami/charts/blob/master/bitnami/wordpress/templates/deployment.yaml)
 - [bitnami/charts](https://github.com/bitnami/charts/blob/master/bitnami/mariadb/templates/master-statefulset.yaml)
+- [kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx/blob/master/charts/ingress-nginx/values.yaml)

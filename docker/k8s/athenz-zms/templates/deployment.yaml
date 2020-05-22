@@ -1,3 +1,4 @@
+{{- $metricPort := (include "athenz-zms.metrics.port" .) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,8 +23,15 @@ spec:
         app: {{ template "athenz-zms.name" . }}
         chart: {{ template "athenz-zms.chart" . }}
         release: {{ .Release.Name | quote }}
-      {{- if .Values.podAnnotations }}
-      annotations: {{ toYaml .Values.podAnnotations | nindent 8 }}
+      {{- if or .Values.podAnnotations $metricPort }}
+      annotations:
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
+        {{- if $metricPort }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ $metricPort | quote }}
+        {{- end }}
       {{- end }}
     spec:
 {{- include "athenz-zms.imagePullSecrets" . | indent 6 }}
@@ -175,6 +183,10 @@ spec:
           ports:
             - name: zms
               containerPort: 4443
+            {{- if $metricPort }}
+            - name: metrics
+              containerPort: {{ $metricPort }}
+            {{- end }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
@@ -185,6 +197,18 @@ spec:
               path: /zms/v1/status
               port: zms
               scheme: HTTPS
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            httpGet:
+              path: /zms/v1/status
+              port: zms
+              scheme: HTTPS
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /opt/athenz/zms/conf/zms_server
@@ -195,7 +219,7 @@ spec:
             - name: log
               mountPath: /opt/athenz/zms/logs/zms_server
           {{- if .Values.resources }}
-          resources: {{- toYaml .Values.resources | nindent 12 }}
+          resources: {{ toYaml .Values.resources | nindent 12 }}
           {{- end }}
       volumes:
         - name: script
