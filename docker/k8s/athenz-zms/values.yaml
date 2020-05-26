@@ -5,8 +5,7 @@
 # global:
 #   imageRegistry: myRegistryName
 #   imagePullSecrets:
-#     - myRegistryKeySecretName
-#   storageClass: myStorageClass
+#     - name: myRegistryKeySecretName
 
 ## Athenz ZMS image version
 ## ref: https://hub.docker.com/r/wzyahoo/athenz-zms-server/tags
@@ -15,9 +14,14 @@ image:
   registry: docker.io
   repository: wzyahoo/athenz-zms-server
   tag: latest
+  ## Init. container image for creating keystore/truststore
+  ## Setting `existingTLSStoreSecret` will skip the init. containers
+  ##
   setup:
     repository: wzyahoo/athenz-setup-env
     tag: latest
+  ## Init. container image for verifying MySQL DB connection
+  ##
   mysql:
     repository: mariadb
     tag: '10.5.2'
@@ -31,11 +35,67 @@ image:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   ##
   # pullSecrets:
-  #   - myRegistryKeySecretName
-  ## Set to true if you would like to see extra information on logs
-  ##
+  #   - name: myRegistryKeySecretName
 
-## Set up update strategy for wordpress installation. Set to Recreate if you use persistent volume that cannot be mounted by more than one pods to makesure the pods is destroyed first.
+## Athenz ZMS passwords
+##
+password:
+  ## MySQL password
+  ##
+  jdbc: ""
+  ## MySQL (read-only) password
+  ##
+  jdbcRo: ""
+  ## Key store password (auto-generated if not set)
+  ##
+  # keystore: ""
+  ## Trust store password (auto-generated if not set)
+  ##
+  # truststore: ""
+
+## Athenz ZMS configuration files
+##
+files:
+  ## ZMS private key path
+  ##
+  zmsKey: "files/secrets/zms/private.pem"
+  tls:
+    ## ZMS server certificate path
+    ##
+    crt: "files/secrets/tls/zms_cert.pem"
+    ## ZMS server certificate private key path
+    ##
+    key: "files/secrets/tls/zms_key.pem"
+    ## ZMS trusted CA certificate paths
+    ##
+    ca:
+      - "files/secrets/tls/CAs/athenz_ca.pem"
+      - "files/secrets/tls/CAs/service_ca.pem"
+      - "files/secrets/tls/CAs/user_ca.pem"
+  ## ZMS config file path (wildcard)
+  ##
+  conf: "files/conf/*"
+
+## Use existing secret for password, keys: `private.pem`, `jdbc`, `jdbcRo`, `keystore`, `truststore`
+##
+existingSecret: ""
+## Use existing secret for TLS certificate, keys: `tls.crt`, `tls.key`
+##
+existingTLSSecret: ""
+## Use existing secret as trusted certificates
+##
+existingTLSCASecret: ""
+
+## Use existing secret for key store & trust store, keys: `zms_keystore.pkcs12`, `zms_truststore.jks`
+## Will ignore values set in existingTLSSecret and existingTLSCASecret
+##
+existingTLSStoreSecret: ""
+
+## Number of ZMS Pods to run
+##
+replicaCount: 1
+
+## Set up update strategy for ZMS installation.
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 ## Example:
 ## updateStrategy:
@@ -45,35 +105,6 @@ image:
 ##    maxUnavailable: 25%
 updateStrategy:
   type: RollingUpdate
-
-replicaCount: 1
-
-password:
-  jdbc: "athenz_admin"
-  jdbcRo: "athenz_admin"
-  # keystore: ""
-  # truststore: ""
-files:
-  zmsKey: "files/secrets/zms/private.pem"
-  tls:
-    crt: "files/secrets/tls/zms_cert.pem"
-    key: "files/secrets/tls/zms_key.pem"
-    ca:
-      - "files/secrets/tls/CAs/athenz_ca.pem"
-      - "files/secrets/tls/CAs/service_ca.pem"
-      - "files/secrets/tls/CAs/user_ca.pem"
-  conf: "files/conf/*"
-
-## keys: private.pem (.files.zmsKey), keystore, truststore, jdbc (.password.jdbc), jdbcRo (.password.jdbcRo)
-existingSecret: "wzzms-athenz-zms-2"
-# .files.tls.crt and .files.tls.key
-# existingTLSSecret: "wzzms-athenz-zms-tls-2"
-# .files.tls.ca
-# existingTLSCASecret: "wzzms-athenz-zms-tls-ca-2"
-
-# overwrite existingTLSSecret and existingTLSCASecret
-# keys: zms_keystore.pkcs12, zms_truststore.jks
-existingTLSStoreSecret: "wzzms-athenz-zms-tls-store-2"
 
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
@@ -98,7 +129,7 @@ nodeSelector: {}
 ## Tolerations for pod assignment. Evaluated as a template.
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
-tolerations: {}
+tolerations: []
 
 ## K8s Security Context for ZMS pods
 ## https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
@@ -115,17 +146,18 @@ livenessProbe:
   initialDelaySeconds: 120
   periodSeconds: 10
   timeoutSeconds: 1
-  successThreshold: 1
   failureThreshold: 3
+  successThreshold: 1
 readinessProbe:
   enabled: true
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 1
-  successThreshold: 1
   failureThreshold: 3
+  successThreshold: 1
 
-## ZMS containers' resource requests and limits (default: for alpha env.)
+## ZMS containers' resource requests and limits
+## The default values are for alpha env.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
 resources:
@@ -134,7 +166,7 @@ resources:
     memory: 4096Mi
     cpu: 500m
 
-## Kubernetes configuration
+## ZMS service configuration
 ## For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP
 ## ZMS requires mTLS for authentication. Direct TCP forwarding is preferred in ingress or load balancer.
 ##
@@ -151,59 +183,37 @@ service:
   externalIPs: []
 
   # loadBalancerIP: ""
-  loadBalancerSourceRanges: []
+  # loadBalancerSourceRanges: []
 
-  ## Set external traffic policy to: "Local" to preserve source IP on
-  ## providers supporting it
+  ## Set external traffic policy to: "Local" to preserve source IP
   ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
+  ##
   # externalTrafficPolicy: ""
 
-  # Must be either "None" or "ClientIP" if set. Kubernetes will default to "None".
-  # Ref: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
+  ## Must be either "None" or "ClientIP" if set. Kubernetes will default to "None".
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
+  ##
   # sessionAffinity: ""
 
-  # specifies the health check node port (numeric port number) for the service. If healthCheckNodePort isn’t specified,
+  # Specifies the health check node port (numeric port number) for the service. If healthCheckNodePort isn’t specified,
   # the service controller allocates a port from your cluster’s NodePort range.
   # Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
   # healthCheckNodePort: 0
 
   type: LoadBalancer
 
   # type: NodePort
-  nodePort: 30007
-# ------
+  # nodePort: 0
 
-# run after default init. containers
-extraInitContainers: |
-  - name: tls-echo
-    image: {{ template "athenz-zms.setup.image" . }}
-    imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-    env:
-      - name: ZMS_KEYSTORE_PATH
-        value: /opt/athenz/zms/var/certs/zms_keystore.pkcs12
-      - name: ZMS_KEYSTORE_PASS
-        valueFrom:
-          secretKeyRef:
-            name: {{ template "athenz-zms.secretName" . }}
-            key: keystore
-      - name: ZMS_TRUSTSTORE_PATH
-        value: /opt/athenz/zms/var/certs/zms_truststore.jks
-      - name: ZMS_TRUSTSTORE_PASS
-        valueFrom:
-          secretKeyRef:
-            name: {{ template "athenz-zms.secretName" . }}
-            key: truststore
-    command:
-      - "/bin/sh"
-      - "-c"
-      - >-
-        keytool -list -storepass "${ZMS_KEYSTORE_PASS}" -keystore "${ZMS_KEYSTORE_PATH}"; keytool -list -storepass "${ZMS_TRUSTSTORE_PASS}" -keystore "${ZMS_TRUSTSTORE_PATH}"
-    volumeMounts:
-      - name: tls-stores
-        mountPath: /opt/athenz/zms/var/certs
+## Additional init. containers that run after default init. containers
+##
+# extraInitContainers: |
 
+## Additional sidecars
+##
 # sidecarContainers: |
 
 ## Prometheus Metrics
-# ZMS has built-in support of prometheus.
-# Annotation will be injected automatically when the related properties are set in the config files.
+## ZMS has built-in support of prometheus.
+## Annotation will be injected automatically when the related properties are set in the config files.
