@@ -1,4 +1,4 @@
-{{- $metricPort := (include "athenz-zms.metrics.port" .) }}
+{{- $metricsPort := (include "athenz-zms.metrics.port" .) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,14 +23,14 @@ spec:
         app: {{ template "athenz-zms.name" . }}
         chart: {{ template "athenz-zms.chart" . }}
         release: {{ .Release.Name | quote }}
-      {{- if or .Values.podAnnotations $metricPort }}
+      {{- if or .Values.podAnnotations $metricsPort }}
       annotations:
         {{- if .Values.podAnnotations }}
         {{- toYaml .Values.podAnnotations | nindent 8 }}
         {{- end }}
-        {{- if $metricPort }}
+        {{- if $metricsPort }}
         prometheus.io/scrape: "true"
-        prometheus.io/port: {{ $metricPort | quote }}
+        prometheus.io/port: {{ $metricsPort | quote }}
         {{- end }}
       {{- end }}
     spec:
@@ -105,7 +105,7 @@ spec:
         {{- $jdbcURP := (include "athenz-zms.jdbc.userHostPort" .) }}
         {{- if not (hasSuffix ":" $jdbcURP) }}
         {{- $jdbcURPList := (splitList ":" $jdbcURP) }}
-        - name: wait-for-master-db
+        - name: wait-for-jdbc-db
           image: {{ template "athenz-zms.mysql.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           command:
@@ -128,7 +128,7 @@ spec:
         {{- $jdbcRoUHP := (include "athenz-zms.jdbc.ro.userHostPort" .) }}
         {{- if not (hasSuffix ":" $jdbcRoUHP) }}
         {{- $jdbcRoUHPList := (splitList ":" $jdbcRoUHP) }}
-        - name: wait-for-slave-db
+        - name: wait-for-jdbc-ro-db
           image: {{ template "athenz-zms.mysql.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           command:
@@ -183,9 +183,9 @@ spec:
           ports:
             - name: zms
               containerPort: 4443
-            {{- if $metricPort }}
+            {{- if $metricsPort }}
             - name: metrics
-              containerPort: {{ $metricPort }}
+              containerPort: {{ $metricsPort }}
             {{- end }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}

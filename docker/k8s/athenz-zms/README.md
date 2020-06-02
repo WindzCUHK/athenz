@@ -173,7 +173,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `athenz.zms.jdbc_store`                        | ZMS MySQL URL                      | `jdbc:mysql://zms-db-mariadb.default.svc.cluster.local:3306/zms_server`       |
 | `athenz.zms.jdbc_ro_user`                      | ZMS MySQL (read-only) user         | `zms_admin`                                                                   |
 | `athenz.zms.jdbc_ro_store`                     | ZMS MySQL (read-only) URL          | `jdbc:mysql://zms-db-mariadb-slave.default.svc.cluster.local:3306/zms_server` |
-| `athenz.metrics.prometheus.enable`             | Prometheus metric enabled          | `true`                                                                        |
+| `athenz.metrics.prometheus.enable`             | Prometheus metrics enabled         | `true`                                                                        |
 | `athenz.metrics.prometheus.http_server.enable` | Prometheus scrape endpoint enabled | `true`                                                                        |
 | `athenz.metrics.prometheus.http_server.port`   | Prometheus port                    | `8181`                                                                        |
 
